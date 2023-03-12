@@ -1,0 +1,133 @@
+#include "MNIST.h"
+
+void MNIST::loadExpectedValues(string path, vector<int> &values,
+                               vector<int> &valid_values, bool hasValid) {
+
+    ifstream file(path, ios::binary);
+
+    if (file.is_open()) {
+        int magic_number = 0;
+        int number_of_images = 0;
+
+        file.read((char *)&magic_number, sizeof(magic_number));
+        magic_number = Util::reverseInt(magic_number);
+        file.read((char *)&number_of_images, sizeof(number_of_images));
+        number_of_images = Util::reverseInt(number_of_images);
+
+        int len = hasValid ? number_of_images - MNIST_VALID_LEN : number_of_images;
+        for (int indx_val = 0; indx_val < len; ++indx_val) {
+            unsigned char temp = 0;
+            file.read((char *)&temp, sizeof(temp));
+            values[indx_val] = (int)temp;
+        }
+
+        if (hasValid) {
+            for (int indx_val = len+1; indx_val < number_of_images; ++indx_val) {
+                unsigned char temp = 0;
+                file.read((char *)&temp, sizeof(temp));
+                valid_values[indx_val] = (int)temp;
+            }
+        }
+    }
+}
+
+
+// Load the dataset and fill the Elements (_DS and _EV)
+void MNIST::loadDataset(string path, Elements &set,
+                        Elements &valid_set, bool hasValid) {
+
+    ifstream file(path, ios::binary);
+
+    if (file.is_open()) {
+        int magic_number = 0;
+        int number_of_images = 0;
+        int n_rows = 0;
+        int n_cols = 0;
+        file.read((char *)&magic_number, sizeof(magic_number));
+        magic_number = Util::reverseInt(magic_number);
+        file.read((char *)&number_of_images, sizeof(number_of_images));
+        number_of_images = Util::reverseInt(number_of_images);
+        file.read((char *)&n_rows, sizeof(n_rows));
+        n_rows = Util::reverseInt(n_rows);
+        file.read((char *)&n_cols, sizeof(n_cols));
+        n_cols = Util::reverseInt(n_cols);
+
+        int len = hasValid ? number_of_images - MNIST_VALID_LEN : number_of_images;
+        for (int indx_img = 0; indx_img < len; ++indx_img) {
+            for (int indx_row = 0; indx_row < n_rows; ++indx_row) {
+                for (int indx_col = 0; indx_col < n_cols; ++indx_col) {
+                    unsigned char temp = 0;
+                    file.read((char *)&temp, sizeof(temp));
+                    int index[4] = {indx_img, 0, indx_row, indx_col};
+                    set.assign((double)temp, index, DIMS);
+                }
+            }
+        }
+
+        if (hasValid) {
+            for (int indx_img = len+1; indx_img < number_of_images; ++indx_img) {
+                for (int indx_row = 0; indx_row < n_rows; ++indx_row) {
+                    for (int indx_col = 0; indx_col < n_cols; ++indx_col) {
+                        unsigned char temp = 0;
+                        file.read((char *)&temp, sizeof(temp));
+                        int index[4] = {indx_img, 0, indx_row, indx_col};
+                        valid_set.assign((double)temp, index, DIMS);
+                    }
+                }
+            }
+        }
+
+
+        // PREVIEW
+//        cout << "First image: " << endl;
+//        for (int r = 0; r < IMAGE_SIDE; ++r) {
+//            for (int c = 0; c < IMAGE_SIDE; ++c) {
+//                int index[4] = { 0, r, c, 0 };
+//                cout << set.get_value(index, 4) << " ";
+//            }
+//            cout << endl;
+//        }
+        cout << "\n\tDatasets loaded" << endl;
+    } else {
+        cerr << "Error: The dataset could not be found." << endl;
+    }
+}
+
+void MNIST::initDataset(Elements &Train_DS, vector<int> &Train_EV,
+                        Elements &Test_DS, vector<int> &Test_EV,
+                        Elements &Valid_DS, vector<int> &Valid_EV) {
+
+    int train_shapes[4] = { MNIST_TRAIN_LEN, 1, IMAGE_SIDE, IMAGE_SIDE };
+    int valid_shapes[4] = { MNIST_VALID_LEN, 1, IMAGE_SIDE, IMAGE_SIDE };
+    int test_shapes[4]  = { MNIST_TEST_LEN, 1, IMAGE_SIDE, IMAGE_SIDE };
+
+    Train_DS.init(train_shapes, 4);
+    Valid_DS.init(valid_shapes, 4);
+    Test_DS.init(test_shapes, 4);
+
+    Train_EV.assign(MNIST_TRAIN_LEN, 0);
+    Valid_EV.assign(MNIST_VALID_LEN, 0);
+    Test_EV.assign(MNIST_TEST_LEN, 0);
+}
+
+void MNIST::getDataset(Elements &Train_DS, vector<int> &Train_EV, Elements &Test_DS,
+                      vector<int> &Test_EV, Elements &Valid_DS,
+                      vector<int> &Valid_EV) {
+
+    initDataset(Train_DS, Train_EV, Test_DS, Test_EV, Valid_DS, Valid_EV);
+
+    cout << "\no Loading MNIST datasets" << endl;
+
+    string path_to_folder = "/Users/radoslavradev/Sites/bachelor-thesis/"
+                            "bachelor-thesis-source-code/MNIST_data/";
+
+    loadDataset(path_to_folder + "train-images.idx3-ubyte", Train_DS, Valid_DS, true);
+    loadExpectedValues(path_to_folder + "train-labels.idx1-ubyte", Train_EV, Valid_EV, true);
+
+    loadDataset(path_to_folder + "t10k-images.idx3-ubyte", Test_DS, Test_DS);
+    loadExpectedValues(path_to_folder + "t10k-labels.idx1-ubyte", Test_EV, Test_EV);
+
+    Util::normalizeSet(Train_DS, MNIST_TRAIN_LEN, IMAGE_SIDE, IMAGE_SIDE);
+    Util::normalizeSet(Valid_DS, MNIST_VALID_LEN, IMAGE_SIDE, IMAGE_SIDE);
+    Util::normalizeSet(Test_DS, MNIST_TEST_LEN, IMAGE_SIDE, IMAGE_SIDE);
+}
