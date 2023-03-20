@@ -96,6 +96,4 @@ private:
             );
 };
 
-// Other datasets to be implemented in separate classes
-
 #endif

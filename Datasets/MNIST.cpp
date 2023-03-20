@@ -140,7 +140,7 @@ void MNIST::normalizeSet(Elements &set, int length, int width, int height) {
         for (int indx_row = 0; indx_row < width; ++indx_row) {
             for (int indx_col = 0; indx_col < height; ++indx_col) {
                 int index[4] = { indx_img, 0, indx_row, indx_col };
-                val = set.get_value(index, DIMS);
+                val = set.getValue(index, DIMS);
 
                 if (val > max)
                     max = val;
@@ -153,7 +153,7 @@ void MNIST::normalizeSet(Elements &set, int length, int width, int height) {
         for (int indx_row = 0; indx_row < width; ++indx_row) {
             for (int indx_col = 0; indx_col < height; ++indx_col) {
                 int index[4] = { indx_img, 0, indx_row, indx_col };
-                val = set.get_value(index, DIMS);
+                val = set.getValue(index, DIMS);
 
                 val = (val - min) / (max - min);
 

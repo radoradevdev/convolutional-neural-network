@@ -1,184 +1,200 @@
 #include "Elements.h"
 
-Elements::Elements() {}
+Elements::Elements(int height, int width) {
 
-Elements::Elements(int H, int W) {
-
-    _mtx.resize(H * W);
-    _length = H * W;
-    _dim = 2;
-    _shape.resize(_dim);
-    _shape[0] = H;
-    _shape[1] = W;
+    _data.resize(height * width);
+    _length = height * width;
+    _params_length = 2;
+    _params.resize(_params_length);
+    _params[0] = height;
+    _params[1] = width;
 }
 
-Elements::Elements(int H, int W, int Depth) {
+Elements::Elements(int height, int width, int depth) {
 
-    _mtx.resize(H * W * Depth, 0);
-    _length = H * W * Depth;
-    _dim = 3;
-    _shape.resize(_dim);
-    _shape[0] = H;
-    _shape[1] = W;
-    _shape[2] = Depth;
+    _data.resize(height * width * depth, 0);
+    _length = height * width * depth;
+    _params_length = 3;
+    _params.resize(_params_length);
+    _params[0] = height;
+    _params[1] = width;
+    _params[2] = depth;
 }
 
-Elements::Elements(int Layers, int H, int W, int Depth) {
+Elements::Elements(int layers, int height, int width, int depth) {
 
-    _mtx.resize(Layers * H * W * Depth);
-    _length = Layers * H * W * Depth;
-    _dim = 4;
-    _shape.resize(_dim);
-    _shape[0] = Layers;
-    _shape[1] = H;
-    _shape[2] = W;
-    _shape[3] = Depth;
+    _data.resize(layers * height * width * depth);
+    _length = layers * height * width * depth;
+    _params_length = 4;
+    _params.resize(_params_length);
+    _params[0] = layers;
+    _params[1] = height;
+    _params[2] = width;
+    _params[3] = depth;
 }
 
-Elements::Elements(int *shapes, int dimensions) {
+Elements::Elements(int *params, int length) {
 
     _length = 1;
-    _dim = dimensions;
-    _shape.assign(shapes, shapes + dimensions);
+    _params_length = length;
+    _params.assign(params, params + length);
 
-    for (int i = 0; i < dimensions; i++)
-        _length *= shapes[i];
+    for (int indx = 0; indx < length; indx++)
+        _length *= params[indx];
 
-    _mtx.resize(_length);
+    _data.resize(_length);
 }
 
-void Elements::init(const int *shapes, int dimensions) {
-    if (_mtx.size() != 0) {
-        cerr << "Error: volume already allocated." << endl;
+void Elements::init(const int *params, int length) {
+    if (_data.size() != 0) {
+        // TODO decide on errors (Data already set)
     } else {
         _length = 1;
-        _dim = dimensions;
-        _shape.assign(shapes, shapes + dimensions);
+        _params_length = length;
+        _params.assign(params, params + length);
 
-        for (int i = 0; i < dimensions; i++) {
-            _length *= shapes[i];
+        for (int indx = 0; indx < length; indx++) {
+            _length *= params[indx];
         }
 
-        _mtx.resize(_length);
+        _data.resize(_length);
     }
 }
 
-// The contenent is lost
-void Elements::rebuild(int *shapes, int dimensions) {
+void Elements::reinit(int *params, int length) {
 
     _length = 1;
-    _dim = dimensions;
-    _shape.assign(shapes, shapes + dimensions);
+    _params_length = length;
+    _params.assign(params, params + length);
 
-    for (int i = 0; i < dimensions; i++) {
-        _length *= shapes[i];
+    for (int indx = 0; indx < length; indx++) {
+        _length *= params[indx];
     }
 
-    _mtx.assign(_length, 0);
+    _data.assign(_length, 0);
 }
 
-// The access at the index (l,h,w,d) = mtx[l][h][w][d] is in the form of (4D
-// case):  mtx[ l + h *Layers + w *Layers*Heigth + d *Layers*Heigth*Width]
-void Elements::assign(double val, int *index, int dimensions) {
+void Elements::assign(double val, int *index, int length) {
 
-    if (dimensions != _dim) {
-        cerr << "Error: dimensions must match the dimensions of the volume." << endl;
+    if (length != _params_length) {
+        // TODO decide on errors (Incorrect params length)
     } else {
+        // When _params_length = 4:
+        // _data[l + h*l + w*l*h + d*l*h*w]
+
+        // When _params_length = 3:
+        // _data[h + w*h + d*h*w]
+
+        // When _params_length = 2:
+        // _data[h + w*h]
+        // TODO
         int element = 0, offset = 1;
 
-        for (int i = 0; i < dimensions; i++) {
+        for (int indx = 0; indx < length; indx++) {
             offset = 1;
-            for (int sh = 0; sh < i; sh++) {
-                offset *= _shape[sh];
+            for (int params_indx = 0; params_indx < indx; params_indx++) {
+                offset *= _params[params_indx];
             }
 
-            element += index[i] * offset;
+            element += index[indx] * offset;
         }
-        _mtx[element] = val;
+        _data[element] = val;
     }
 }
 
-double Elements::get_value(int *index, int dimensions) {
-    double rt = -1;
+double Elements::getValue(int *index, int params_length) {
+    double res = -1;
 
-    if (dimensions != _dim) {
-        cerr << "Error: dimensions must match the dimensions of the volume."
-             << endl;
+    if (params_length != _params_length) {
+        // TODO decide on errors (Incorrect params length)
     } else {
+        // When _params_length = 4:
+        // _data[l + h*l + w*l*h + d*l*h*w]
+
+        // When _params_length = 3:
+        // _data[h + w*h + d*h*w]
+
+        // When _params_length = 2:
+        // _data[h + w*h]
+        // TODO
         int element = 0, offset = 1;
 
-        for (int i = 0; i < dimensions; i++) {
+        for (int indx = 0; indx < params_length; indx++) {
             offset = 1;
-            for (int sh = 0; sh < i; sh++) {
-                offset *= _shape[sh];
+            for (int params_indx = 0; params_indx < indx; params_indx++) {
+                offset *= _params[params_indx];
             }
 
-            element += index[i] * offset;
+            element += index[indx] * offset;
         }
 
-        rt = _mtx[element];
+        res = _data[element];
     }
 
-    return rt;
+    return res;
 }
 
-void Elements::sum(double val, int *index, int dimensions) {
-    if (dimensions != _dim) {
-        cerr << "Error: dimensions must match the dimensions of the volume."
-             << endl;
+void Elements::add(double val, int *index, int length) {
+    if (length != _params_length) {
+        // TODO decide on errors (Incorrect params length)
     } else {
+        // When _params_length = 4:
+        // _data[l + h*l + w*l*h + d*l*h*w]
+
+        // When _params_length = 3:
+        // _data[h + w*h + d*h*w]
+
+        // When _params_length = 2:
+        // _data[h + w*h]
+        // TODO
         int element = 0, offset = 1;
 
-        for (int i = 0; i < dimensions; i++) {
+        for (int indx = 0; indx < length; indx++) {
             offset = 1;
-            for (int sh = 0; sh < i; sh++) {
-                offset *= _shape[sh];
+            for (int params_indx = 0; params_indx < indx; params_indx++) {
+                offset *= _params[params_indx];
             }
 
-            element += index[i] * offset;
+            element += index[indx] * offset;
         }
 
-        _mtx[element] += val;
+        _data[element] += val;
     }
 }
 
-int Elements::get_shape(int dim_n) {
-    return _shape[dim_n];
+int Elements::getParam(int index) {
+    return _params[index];
 }
 
-int Elements::get_length() { return _length; }
+int Elements::getLength() {
+    return _length;
+}
 
-vector<double> &Elements::get_vector() { return _mtx; }
+vector<double> &Elements::getData() {
+    return _data;
+}
 
-Elements &Elements::operator=(const Elements &start_vol) {
-    // 1.  Deallocate any memory that _mtx is using internally
-    // 2.  Allocate some memory to hold the contents of start_vol
-    // 3.  Copy the values from start_vol into this instance
-    // 4.  Return *this
-    if (this == &start_vol) {
+Elements &Elements::operator=(const Elements &elements) {
+    if (this == &elements) {
         return *this;
     } else {
-        // release resource in *this
-        _mtx.resize(0), _shape.resize(0);
-        _dim = 0, _length = 0;
+        _data.resize(0), _params.resize(0);
+        _params_length = 0, _length = 0;
 
-        // allocate resource in *this
-        this->init(&(start_vol._shape[0]), start_vol._dim);
+        this->init(&(elements._params[0]), elements._params_length);
 
-        // copy the content (_mtx)
-        this->_mtx = start_vol._mtx;
+        this->_data = elements._data;
     }
 
-    return *this; // Return a reference to myself.
+    return *this;
 }
 
-// Return the single value in the inserted position of the vector volume.
-// Keep in mind that is accessed as a vector
+
 double &Elements::operator[](int index) {
     if (index >= _length) {
-        cerr << "Array index out of bound, returned last element." << endl;
-        return _mtx.back();
+        // TODO decide on errors (Index out of bound)
+        return _data.back();
     }
 
-    return _mtx[index];
+    return _data[index];
 }

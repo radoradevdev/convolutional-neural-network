@@ -1,13 +1,13 @@
 #include "Util.h"
 
 void Util::ReLu(Elements &input_volume) {
-    for (int a = 0; a < input_volume.get_length(); a++)
+    for (int a = 0; a < input_volume.getLength(); a++)
         if (input_volume[a] < 0)
             input_volume[a] *= ALPHA;
 }
 
 void Util::deLeReLu(Elements &input_volume) {
-    for (int a = 0; a < input_volume.get_length(); a++)
+    for (int a = 0; a < input_volume.getLength(); a++)
         if (input_volume[a] < 0)
             input_volume[a] = ALPHA;
 }

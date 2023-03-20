@@ -8,34 +8,107 @@ using namespace std;
 
 class Elements {
 public:
-    Elements(); // Void volume object
+    Elements() {}
 
-    Elements(int H, int W);
-    Elements(int H, int W, int Depth);
-    Elements(int Layers, int H, int W, int Depth);
-    Elements(int *shapes, int dimensions);
+    //! Constructor height and width
+    /*!
+      \param height height of every image
+      \param width  width of every image
+    */
+    Elements(int height, int width);
 
-    void init(const int *shapes,
-              int dimensions); // Usefull to postpone istantiation
-    void rebuild(int *shapes, int dimensions);
+    //! Constructor height, width and depth
+    /*!
+      \param height height of every image
+      \param width  width of every image
+      \param depth  TODO
+    */
+    Elements(int height, int width, int depth);
 
-    int get_shape(int dim_n);
-    int get_length();
-    double get_value(int *index, int dimensions);
-    vector<double> &get_vector();
+    //! Constructor layers, height, width and depth
+    /*!
+      \param layers TODO
+      \param height height of every image
+      \param width  width of every image
+      \param depth  TODO
+    */
+    Elements(int layers, int height, int width, int depth);
 
-    void assign(double val, int *index, int dimensions);
-    void sum(double val, int *index, int dimensions);
-    // void adjust(double val);
+    //! Constructor parameters and dimensions
+    /*!
+      \param params parameters of the Elements
+      \param length length of the parameters
+    */
+    Elements(int *params, int length);
 
-    Elements &operator=(const Elements &start_vol);
+    //! Initialize after constructor
+    /*!
+      \param params parameters of the Elements
+      \param length length of the parameters
+    */
+    void init(const int *params, int length);
 
+    //! Reinitialize after constructor
+    /*!
+      \param params parameters of the Elements
+      \param length length of the parameters
+    */
+    void reinit(int *params, int length);
+
+    //! Get parameter by index
+    /*!
+      \param index index of the parameter(0=layers, 1=height, 2=width, 3=depth)
+    */
+    int getParam(int index);
+
+    //! Get length, the product of all parameters
+    int getLength();
+
+    //! Get value
+    /*!
+      \param index          TODO
+      \param params_length  length of the parameters
+    */
+    double getValue(int *index, int params_length);
+
+    //! Get data, getter
+    vector<double>& getData();
+
+    //! Assign value to a specific position in the data vector
+    /*!
+      \param val    value to be inserted
+      \param index  index on which to assign
+      \param length length of the parameters
+    */
+    void assign(double val, int *index, int length);
+
+    //! Add a value to a specific position in the data vector, Sum
+    /*!
+      \param val    value to be added
+      \param index  index on which to assign
+      \param length length of the parameters
+    */
+    void add(double val, int *index, int length);
+
+    //! Overloaded assignment operator
+    /*!
+      \param elements   objedt to be copied from
+    */
+    Elements &operator=(const Elements &elements);
+
+    //! Overloaded array index operator [], identical to getValue
+    /*!
+      \param index  index in the data
+    */
     double &operator[](int index);
 
 private:
-    vector<double> _mtx;
-    vector<int> _shape;
-    int _dim = 0, _length = 0;
+    vector<double> _data;   /*!< One-dimensional data */
+    vector<int> _params;    /*!< Parameters, (height, width) or
+                                (height, width, depth) or
+                                (layers, height, width, depth) */
+    int _params_length = 0, /*!< Parameters length */
+        _length = 0;        /*!< Length of the data */
 };
 
 #endif

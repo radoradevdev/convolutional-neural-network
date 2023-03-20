@@ -129,7 +129,7 @@ private:
         _total_lrs = 0,  /*!< Total number of layers */
         _num_clss = 0;   /*!< Number of classes, in the MNIST example there are 10 */
 
-    //! TODO
+    //! depth(of activation/feature maps), width, height
     int _dense_input_shape[3] = {0, 0, 0};
 
     //! depth(of activation/feature maps), width, height

@@ -43,9 +43,9 @@ void Network::loadDataset(DatasetType dataset) {
 
         mnist.getDataset(Train_DS, Train_EV, Valid_DS, Valid_EV, Test_DS, Test_EV);
 
-        _image_shape[2] = Train_DS.get_shape(3); // width
-        _image_shape[1] = Train_DS.get_shape(2); // height
-        _image_shape[0] = Train_DS.get_shape(1); // depth
+        _image_shape[2] = Train_DS.getParam(3); // width
+        _image_shape[1] = Train_DS.getParam(2); // height
+        _image_shape[0] = Train_DS.getParam(1); // depth
     }
     // TODO: add more
 }
@@ -63,12 +63,12 @@ void Network::_forward(Elements &image) {
         } else if (_layers[layer_indx] == LayerType::Full) {
 
             if (_dense_input_shape[0] == 0) {
-                _dense_input_shape[0] = image.get_shape(0);
-                _dense_input_shape[1] = image.get_shape(1);
-                _dense_input_shape[2] = image.get_shape(2);
+                _dense_input_shape[0] = image.getParam(0);
+                _dense_input_shape[1] = image.getParam(1);
+                _dense_input_shape[2] = image.getParam(2);
             }
 
-            _results = _fulls[0].run(image.get_vector());
+            _results = _fulls[0].run(image.getData());
         }
     }
 }
@@ -86,7 +86,7 @@ void Network::_backward(vector<double> &gradient) {
             gradient = _fulls[0].bp(gradient);
 
             img_in.init(_dense_input_shape, 3);
-            img_in.get_vector() = gradient;
+            img_in.getData() = gradient;
         }
     }
 }
@@ -94,7 +94,7 @@ void Network::_backward(vector<double> &gradient) {
 void Network::_getImage(Elements &image, Elements &dataset, int index) {
     double val;
 
-    image.rebuild(_image_shape, 3);
+    image.reinit(_image_shape, 3);
 
     for (int depth = 0; depth < _image_shape[0]; ++depth) {
         for (int width = 0; width < _image_shape[1]; ++width) {
@@ -102,7 +102,7 @@ void Network::_getImage(Elements &image, Elements &dataset, int index) {
 
                 int index_ds[4] = {index, depth, height, width};
                 int index_im[3] = {depth, height, width};
-                val = dataset.get_value(index_ds, 4);
+                val = dataset.getValue(index_ds, 4);
                 image.assign(val, index_im, 3);
             }
         }
@@ -125,7 +125,7 @@ void Network::_iterate(
     time_t t_start;
     time(&t_start);
 
-    int dataset_size = dataset.get_shape(0);
+    int dataset_size = dataset.getParam(0);
 
     for (int sample_indx = 0; sample_indx < dataset_size; sample_indx++) {
 
@@ -251,7 +251,7 @@ void Network::checkConfiguration(int set_size, int epochs) {
             for (int c = 0; c < _image_shape[1]; ++c) {
                 for (int r = 0; r < _image_shape[2]; ++r) {
                     int index[4] = {sample, d, r, c};
-                    val = Test_DS.get_value(index, 4);
+                    val = Test_DS.getValue(index, 4);
                     check_DS.assign(val, index, 4);
                 }
             }

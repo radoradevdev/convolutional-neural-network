@@ -32,7 +32,7 @@ int stride, double bias, double eta) {
 
     double inputs = (kernels[0] * kernels[1] * kernels[2] * kernels[3]);
 
-    for (int i = 0; i < _filter.get_length(); i++)
+    for (int i = 0; i < _filter.getLength(); i++)
         _filter[i] = ((double)(arc4random() % 100)) / 1000;
 }
 
@@ -45,7 +45,7 @@ void ConvolutionalLayer::_pad(Elements &original_img, Elements &out_pad) {
 
                 int output[3] = {D, H + _padding, W + _padding};
                 int input[3] = {D, H, W};
-                out_pad.assign(original_img.get_value(input, 3), output, 3);
+                out_pad.assign(original_img.getValue(input, 3), output, 3);
             }
 
     // for(int i=0; i<3; i++) _image_dim[i]=out_pad.get_shape(i);
@@ -87,7 +87,7 @@ void ConvolutionalLayer::fwd(Elements image, Elements &out) {
     _out_dimension();
     int depth = _out_dim[0], out_H = _out_dim[1], out_W = _out_dim[2];
 
-    out.rebuild(_out_dim, 3);
+    out.reinit(_out_dim, 3);
 
     if (_padding != 0)
         _pad(image, _cache);
@@ -118,8 +118,8 @@ void ConvolutionalLayer::fwd(Elements image, Elements &out) {
                             int in_cache[3] = {layer, y + f_y_it, x + f_x_it};
                             int in_filt[4] = {kernel, f_y_it, f_x_it, layer};
                             double val =
-                                    _cache.get_value(in_cache, 3) * _filter.get_value(in_filt, 4);
-                            out.sum(val, arr_out, 3);
+                                    _cache.getValue(in_cache, 3) * _filter.getValue(in_filt, 4);
+                            out.add(val, arr_out, 3);
                         }
                     }
                     x_out++;
@@ -144,7 +144,7 @@ void ConvolutionalLayer::bp(Elements d_out_vol, Elements &d_input) {
 
     // d_input = np.zeros( (  self.padded_dim[0], self.padded_dim[1],
     // self.padded_dim[2]) )
-    d_input.rebuild(_image_dim, 3);
+    d_input.reinit(_image_dim, 3);
 
     Elements d_filters(
                 _specs[0], _specs[1], _specs[2],
@@ -174,16 +174,16 @@ void ConvolutionalLayer::bp(Elements d_out_vol, Elements &d_input) {
                             int in_cache[3] = {layer, y + f_y_it, x + f_x_it};
                             int in_vol[3] = {kernel, y_out, x_out};
 
-                            double val_d_filt = _cache.get_value(in_cache, 3) *
-                                    d_out_vol.get_value(in_vol, 3);
+                            double val_d_filt = _cache.getValue(in_cache, 3) *
+                                    d_out_vol.getValue(in_vol, 3);
                             double val_d_in =
-                                    d_out_vol.get_value(in_vol, 3) * _filter.get_value(filt, 4);
+                                    d_out_vol.getValue(in_vol, 3) * _filter.getValue(filt, 4);
 
-                            d_filters.sum(val_d_filt, filt,
+                            d_filters.add(val_d_filt, filt,
                                           4); // d_filters[kernel, f_y_it, f_x_it, layer] +=
                             // _cache[layer, y + f_y_it, x + f_x_it ] *
                             // d_out_vol[kernel, y_out, x_out ]
-                            d_input.sum(val_d_in, out_in,
+                            d_input.add(val_d_in, out_in,
                                         3); // d_input[layer, y + f_y_it, x + f_x_it ] +=
                             // d_out_vol[kernel, y_out, x_out ] *
                             // self.filters[kernel, f_y_it, f_x_it, layer]
@@ -203,10 +203,10 @@ void ConvolutionalLayer::bp(Elements d_out_vol, Elements &d_input) {
     for (int kernel = 0; kernel < n_kernel; kernel++) {
 
         k_bias = 0;
-        for (int y = 0; y < d_out_vol.get_shape(1); y++) {
-            for (int x = 0; x < d_out_vol.get_shape(2); x++) {
+        for (int y = 0; y < d_out_vol.getParam(1); y++) {
+            for (int x = 0; x < d_out_vol.getParam(2); x++) {
                 int i[3] = {kernel, y, x};
-                k_bias += d_out_vol.get_value(i, 3);
+                k_bias += d_out_vol.getValue(i, 3);
             }
         }
         d_bias.push_back(k_bias);
@@ -233,9 +233,9 @@ void ConvolutionalLayer::_gd(Elements &d_filter, vector<double> &d_bias) {
 
                     int index[4] = {kernel, y, x, layer};
 
-                    double delta = -_eta * d_filter.get_value(index, 4);
+                    double delta = -_eta * d_filter.getValue(index, 4);
 
-                    _filter.sum(delta, index, 4);
+                    _filter.add(delta, index, 4);
                 }
             }
         }
