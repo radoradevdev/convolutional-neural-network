@@ -15,6 +15,10 @@
 
 using namespace std;
 
+//! MNIST class
+/*!
+  The class describes the MNIST dataset and its specificacy
+*/
 class MNIST {
 public:
     //! Get the dataset

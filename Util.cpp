@@ -1,15 +1,15 @@
 #include "Util.h"
 
-void Util::ReLu(Elements &input_volume) {
-    for (int a = 0; a < input_volume.getLength(); a++)
-        if (input_volume[a] < 0)
-            input_volume[a] *= ALPHA;
+void Util::ReLu(Elements &data) {
+    for (int a = 0; a < data.getLength(); a++)
+        if (data[a] < 0)
+            data[a] *= ALPHA;
 }
 
-void Util::deLeReLu(Elements &input_volume) {
-    for (int a = 0; a < input_volume.getLength(); a++)
-        if (input_volume[a] < 0)
-            input_volume[a] = ALPHA;
+void Util::deLeReLu(Elements &data) {
+    for (int a = 0; a < data.getLength(); a++)
+        if (data[a] < 0)
+            data[a] = ALPHA;
 }
 
 int Util::reverseInt(int i) {
@@ -23,5 +23,4 @@ int Util::reverseInt(int i) {
 
 double Util::frand() {
     return (double)(arc4random() % 100) / 1000;
-    // return (2.0*(double)rand() / RAND_MAX) - 1.0;
 }

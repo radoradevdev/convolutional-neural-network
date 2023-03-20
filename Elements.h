@@ -6,6 +6,10 @@
 
 using namespace std;
 
+//! Elements class
+/*!
+  The class describes the data after it has been read from the dataset
+*/
 class Elements {
 public:
     Elements() {}
