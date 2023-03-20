@@ -49,6 +49,7 @@ void Elements::init(const int *params, int length) {
     if (_data.size() != 0) {
         // TODO decide on errors (Data already set)
     } else {
+        // TODO init and reinit
         _length = 1;
         _params_length = length;
         _params.assign(params, params + length);
@@ -62,7 +63,7 @@ void Elements::init(const int *params, int length) {
 }
 
 void Elements::reinit(int *params, int length) {
-
+    // TODO init and reinit
     _length = 1;
     _params_length = length;
     _params.assign(params, params + length);
@@ -155,6 +156,7 @@ void Elements::add(double val, int *index, int length) {
                 offset *= _params[params_indx];
             }
 
+            // TODO index[indx]
             element += index[indx] * offset;
         }
 
