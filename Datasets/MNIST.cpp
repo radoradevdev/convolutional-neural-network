@@ -1,7 +1,11 @@
 #include "MNIST.h"
 
-void MNIST::loadExpectedValues(string path, vector<int> &values,
-                               vector<int> &valid_values, bool hasValid) {
+void MNIST::loadExpectedValues(
+        string path,
+        vector<int> &values,
+        vector<int> &valid_values,
+        bool hasValid
+        ) {
 
     ifstream file(path, ios::binary);
 
@@ -31,11 +35,14 @@ void MNIST::loadExpectedValues(string path, vector<int> &values,
     }
 }
 
+void MNIST::loadDataset(
+        string path,
+        Elements &set,
+        Elements &valid_set,
+        bool hasValid
+        ) {
 
-// Load the dataset and fill the Elements (_DS and _EV)
-void MNIST::loadDataset(string path, Elements &set,
-                        Elements &valid_set, bool hasValid) {
-
+    // Load the dataset and fill the Elements (_DS and _EV)
     ifstream file(path, ios::binary);
 
     if (file.is_open()) {
@@ -77,16 +84,6 @@ void MNIST::loadDataset(string path, Elements &set,
             }
         }
 
-
-        // PREVIEW
-//        cout << "First image: " << endl;
-//        for (int r = 0; r < IMAGE_SIDE; ++r) {
-//            for (int c = 0; c < IMAGE_SIDE; ++c) {
-//                int index[4] = { 0, r, c, 0 };
-//                cout << set.get_value(index, 4) << " ";
-//            }
-//            cout << endl;
-//        }
         cout << "\n\tDatasets loaded" << endl;
     } else {
         cerr << "Error: The dataset could not be found." << endl;
@@ -94,8 +91,8 @@ void MNIST::loadDataset(string path, Elements &set,
 }
 
 void MNIST::initDataset(Elements &Train_DS, vector<int> &Train_EV,
-                        Elements &Test_DS, vector<int> &Test_EV,
-                        Elements &Valid_DS, vector<int> &Valid_EV) {
+                        Elements &Valid_DS, vector<int> &Valid_EV,
+                        Elements &Test_DS, vector<int> &Test_EV) {
 
     int train_shapes[4] = { MNIST_TRAIN_LEN, 1, IMAGE_SIDE, IMAGE_SIDE };
     int valid_shapes[4] = { MNIST_VALID_LEN, 1, IMAGE_SIDE, IMAGE_SIDE };
@@ -110,11 +107,11 @@ void MNIST::initDataset(Elements &Train_DS, vector<int> &Train_EV,
     Test_EV.assign(MNIST_TEST_LEN, 0);
 }
 
-void MNIST::getDataset(Elements &Train_DS, vector<int> &Train_EV, Elements &Test_DS,
-                      vector<int> &Test_EV, Elements &Valid_DS,
-                      vector<int> &Valid_EV) {
+void MNIST::getDataset(Elements &Train_DS, vector<int> &Train_EV,
+                       Elements &Valid_DS, vector<int> &Valid_EV,
+                       Elements &Test_DS, vector<int> &Test_EV ) {
 
-    initDataset(Train_DS, Train_EV, Test_DS, Test_EV, Valid_DS, Valid_EV);
+    initDataset(Train_DS, Train_EV, Valid_DS, Valid_EV, Test_DS, Test_EV);
 
     cout << "\no Loading MNIST datasets" << endl;
 
@@ -127,7 +124,41 @@ void MNIST::getDataset(Elements &Train_DS, vector<int> &Train_EV, Elements &Test
     loadDataset(path_to_folder + "t10k-images.idx3-ubyte", Test_DS, Test_DS);
     loadExpectedValues(path_to_folder + "t10k-labels.idx1-ubyte", Test_EV, Test_EV);
 
-    Util::normalizeSet(Train_DS, MNIST_TRAIN_LEN, IMAGE_SIDE, IMAGE_SIDE);
-    Util::normalizeSet(Valid_DS, MNIST_VALID_LEN, IMAGE_SIDE, IMAGE_SIDE);
-    Util::normalizeSet(Test_DS, MNIST_TEST_LEN, IMAGE_SIDE, IMAGE_SIDE);
+    normalizeSet(Train_DS, MNIST_TRAIN_LEN, IMAGE_SIDE, IMAGE_SIDE);
+    normalizeSet(Valid_DS, MNIST_VALID_LEN, IMAGE_SIDE, IMAGE_SIDE);
+    normalizeSet(Test_DS, MNIST_TEST_LEN, IMAGE_SIDE, IMAGE_SIDE);
+}
+
+// Should require also the depth value
+void MNIST::normalizeSet(Elements &set, int length, int width, int height) {
+
+    for (int indx_img = 0; indx_img < length; indx_img++) {
+
+        // Get max and min values
+        double max = 0, min = 255, val;
+
+        for (int indx_row = 0; indx_row < width; ++indx_row) {
+            for (int indx_col = 0; indx_col < height; ++indx_col) {
+                int index[4] = { indx_img, 0, indx_row, indx_col };
+                val = set.get_value(index, DIMS);
+
+                if (val > max)
+                    max = val;
+                if (val < min)
+                    min = val;
+            }
+        }
+
+        // Normalize every value
+        for (int indx_row = 0; indx_row < width; ++indx_row) {
+            for (int indx_col = 0; indx_col < height; ++indx_col) {
+                int index[4] = { indx_img, 0, indx_row, indx_col };
+                val = set.get_value(index, DIMS);
+
+                val = (val - min) / (max - min);
+
+                set.assign(val, index, DIMS);
+            }
+        }
+    }
 }

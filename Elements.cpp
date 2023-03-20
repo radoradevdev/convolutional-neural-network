@@ -142,7 +142,9 @@ void Elements::sum(double val, int *index, int dimensions) {
     }
 }
 
-int Elements::get_shape(int dim_n) { return _shape[dim_n]; }
+int Elements::get_shape(int dim_n) {
+    return _shape[dim_n];
+}
 
 int Elements::get_length() { return _length; }
 

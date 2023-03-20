@@ -20,17 +20,19 @@ int main(int argc, char *argv[]) {
     // configure the network
     network.addConvolutionalLayer(image_1, kernels_1, padding = 0, stride = 2,
                                   bias = 0.1, eta = 0.01);
+
     network.addConvolutionalLayer(image_2, kernels_2, padding = 0, stride = 2,
                                   bias = 0.1, eta = 0.01);
+
     network.addFullyConnectedLayer(input_layer = 2 * 6 * 6, hidden,
                                    num_classes = 10, bias = 1.0, adam = false,
                                    eta = 0.5);
 
     // load the dataset
-    network.loadDataset("MNIST");
+    network.loadDataset(DatasetType::MNIST);
 
     // sanity check
-    network.doSanityCheck();
+    network.checkConfiguration();
 
     // train the network
     network.train(epochs = 1, 10);

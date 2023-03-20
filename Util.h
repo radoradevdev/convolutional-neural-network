@@ -8,15 +8,12 @@
 
 class Util {
 public:
-    Util();
-
     // Activation functions
     static void ReLu(Elements &input_volume);
     static void deLeReLu(Elements &input_volume);
 
     // Dataset helpers
     static int reverseInt(int i);
-    static void normalizeSet(Elements &set, int len, int n_rows, int n_cols);
     static double frand();
 };
 
