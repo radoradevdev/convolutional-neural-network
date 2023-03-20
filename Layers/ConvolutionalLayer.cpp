@@ -36,8 +36,7 @@ int stride, double bias, double eta) {
         _filter[i] = ((double)(arc4random() % 100)) / 1000;
 }
 
-// Enlarge the shape of the image and _image_dim is changed accordingly
-void ConvolutionalLayer::_pad(Elements &original_img, Elements &out_pad) {
+void ConvolutionalLayer::_addPadding(Elements &image, Elements &out) {
 
     for (int D = 0; D < _image_dim[0]; D++)
         for (int H = 0; H < _image_dim[1] - 2 * _padding; H++)
@@ -45,13 +44,13 @@ void ConvolutionalLayer::_pad(Elements &original_img, Elements &out_pad) {
 
                 int output[3] = {D, H + _padding, W + _padding};
                 int input[3] = {D, H, W};
-                out_pad.assign(original_img.getValue(input, 3), output, 3);
+                out.assign(image.getValue(input, 3), output, 3);
             }
 
     // for(int i=0; i<3; i++) _image_dim[i]=out_pad.get_shape(i);
 }
 
-void ConvolutionalLayer::_out_dimension() {
+void ConvolutionalLayer::_adjustOutDimensions() {
 
     int f_y = _specs[1], f_x = _specs[2];
     double y_doub, x_doub;
@@ -84,13 +83,13 @@ void ConvolutionalLayer::fwd(Elements image, Elements &out) {
     int f_y = _specs[1], f_x = _specs[2], f_d = _specs[3];
     int n_kernel = _specs[0];
 
-    _out_dimension();
+    _adjustOutDimensions();
     int depth = _out_dim[0], out_H = _out_dim[1], out_W = _out_dim[2];
 
     out.reinit(_out_dim, 3);
 
     if (_padding != 0)
-        _pad(image, _cache);
+        _addPadding(image, _cache);
     else
         _cache = image;
     // Now image is saved and adjusted in _cache
@@ -133,9 +132,9 @@ void ConvolutionalLayer::fwd(Elements image, Elements &out) {
     Util::ReLu(out);
 }
 
-void ConvolutionalLayer::bp(Elements d_out_vol, Elements &d_input) {
+void ConvolutionalLayer::bp(Elements out, Elements &image) {
 
-    Util::deLeReLu(d_out_vol);
+    Util::deLeReLu(out);
 
     // image (input or convolution result) - ( depth, out_H, out_W )
     // _specs = (n_kern x H x W x depth) The filters are in _filters
@@ -144,7 +143,7 @@ void ConvolutionalLayer::bp(Elements d_out_vol, Elements &d_input) {
 
     // d_input = np.zeros( (  self.padded_dim[0], self.padded_dim[1],
     // self.padded_dim[2]) )
-    d_input.reinit(_image_dim, 3);
+    image.reinit(_image_dim, 3);
 
     Elements d_filters(
                 _specs[0], _specs[1], _specs[2],
@@ -175,15 +174,15 @@ void ConvolutionalLayer::bp(Elements d_out_vol, Elements &d_input) {
                             int in_vol[3] = {kernel, y_out, x_out};
 
                             double val_d_filt = _cache.getValue(in_cache, 3) *
-                                    d_out_vol.getValue(in_vol, 3);
+                                    out.getValue(in_vol, 3);
                             double val_d_in =
-                                    d_out_vol.getValue(in_vol, 3) * _filter.getValue(filt, 4);
+                                    out.getValue(in_vol, 3) * _filter.getValue(filt, 4);
 
                             d_filters.add(val_d_filt, filt,
                                           4); // d_filters[kernel, f_y_it, f_x_it, layer] +=
                             // _cache[layer, y + f_y_it, x + f_x_it ] *
                             // d_out_vol[kernel, y_out, x_out ]
-                            d_input.add(val_d_in, out_in,
+                            image.add(val_d_in, out_in,
                                         3); // d_input[layer, y + f_y_it, x + f_x_it ] +=
                             // d_out_vol[kernel, y_out, x_out ] *
                             // self.filters[kernel, f_y_it, f_x_it, layer]
@@ -203,19 +202,19 @@ void ConvolutionalLayer::bp(Elements d_out_vol, Elements &d_input) {
     for (int kernel = 0; kernel < n_kernel; kernel++) {
 
         k_bias = 0;
-        for (int y = 0; y < d_out_vol.getParam(1); y++) {
-            for (int x = 0; x < d_out_vol.getParam(2); x++) {
+        for (int y = 0; y < out.getParam(1); y++) {
+            for (int x = 0; x < out.getParam(2); x++) {
                 int i[3] = {kernel, y, x};
-                k_bias += d_out_vol.getValue(i, 3);
+                k_bias += out.getValue(i, 3);
             }
         }
         d_bias.push_back(k_bias);
     }
 
-    _gd(d_filters, d_bias);
+    _applyGradientDescent(d_filters, d_bias);
 }
 
-void ConvolutionalLayer::_gd(Elements &d_filter, vector<double> &d_bias) {
+void ConvolutionalLayer::_applyGradientDescent(Elements &d_filter, vector<double> &d_bias) {
 
     // NB d_filter and _filter same dimension
 
@@ -247,7 +246,7 @@ void ConvolutionalLayer::_gd(Elements &d_filter, vector<double> &d_bias) {
     _iteration++;
 }
 
-void ConvolutionalLayer::new_epoch(double eta) {
+void ConvolutionalLayer::addEpoch(double eta) {
 
     _eta = eta;
     _iteration = 0;

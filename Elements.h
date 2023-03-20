@@ -8,7 +8,8 @@ using namespace std;
 
 //! Elements class
 /*!
-  The class describes the data after it has been read from the dataset
+  The class describes the data as a tensor after it has been read from the dataset.
+  Like Numpy
 */
 class Elements {
 public:

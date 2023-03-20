@@ -15,38 +15,80 @@
 
 using namespace std;
 
+//! ConvolutionalLayer class
+/*!
+  The class describes the operations of the convolutional layers.
+*/
 class ConvolutionalLayer {
+public:
+    //! Constructor for initializing the Convolutional Layer
+    /*!
+      \param image_dim  image dimensions
+      \param kernels    kernel of the convolution.
+      \param padding    padding on all sides, for the kernel to operate
+      \param stride     how many pixels every convolution to shift
+      \param bias       constant to offset the weights
+      \param eta        TODO
+    */
+    ConvolutionalLayer(
+            int image_dim[3],
+            int kernels[4],
+            int padding = 1,
+            int stride = 1,
+            double bias = 0.1,
+            double eta = 0.01
+            );
 
-    int _image_dim[3] = {1, 16, 16}; // image specification
-    int _specs[4] = {2, 3, 3, 1};    // filter specifications
-    int _out_dim[3] = {2, 13, 13};   // convoluted output dimensions
+    //! Adds a new epoch
+    /*!
+      \param eta    TODO
+    */
+    void addEpoch(double eta);
 
-    int _padding = 1;
-    int _stride = 2;
-    int _iteration = 0; // To update the gradient descent
-    double _eta = 0.1;
+    //! Forward propagation in the convolutional layer
+    /*!
+      \param image  original image
+      \param out    result
+    */
+    void fwd(Elements image, Elements &out);
 
-    vector<double> _bias; // The list of bias, same for each kernel so one value
-    // for each of it (kernels[0])
+    //! Backwards propagation in the convolutional layer
+    /*!
+      \param out    result
+      \param image  original image
+    */
+    void bp(Elements out, Elements &image);
+private:
+    int _image_dim[3] = {1, 16, 16}; /*!< Default image specification */
+    int _specs[4] = {2, 3, 3, 1};    /*!< Default kernel spcification */
+    int _out_dim[3] = {2, 13, 13};   /*!< TODO */
+
+    int _padding = 1;   /*! Padding on all sides, for the kernel to operate */
+    int _stride = 2;    /*! How many pixels every convolution to shift */
+    int _iteration = 0; /*! TODO Iterations over the Convolutional layer, for 1 epoch */
+    double _eta = 0.1;  /*! TODO */
+
+    vector<double> _bias; /*! TODO Constant to offset the weights */
 
     Elements _cache;
     Elements _filter;
 
-    void _pad(Elements &original_img, Elements &out_img);
+    //! Enlarge the image and _image_dim is changed accordingly
+    /*!
+     \param image  original image
+      \param out    result
+    */
+    void _addPadding(Elements &image, Elements &out);
 
-    void _gd(Elements &d_filter, vector<double> &d_bias);
+    //! Applies the gradient descent
+    /*!
+      \param d_filter   TODO
+      \param d_bias     TODO
+    */
+    void _applyGradientDescent(Elements &d_filter, vector<double> &d_bias);
 
-    void _out_dimension();
-public:
-    // Store a copy of the vectors since they can cange outside
-    ConvolutionalLayer(int image_dim[3], int kernels[4], int padding = 1,
-    int stride = 1, double bias = 0.1, double eta = 0.01);
-
-    void new_epoch(double eta);
-
-    void fwd(Elements image, Elements &out);
-
-    void bp(Elements d_out_vol, Elements &d_input);
+    //! Adjusts the output dimensions
+    void _adjustOutDimensions();
 };
 
 #endif
