@@ -92,7 +92,7 @@ void FullyConnectedLayer::applyGradientDescent() {
                     if (!_b_adam) {
                         delta = _eta * dw; // learning rate * dw
                     } else {
-                        delta = calcAdam(_network[i][j].m[k], _network[i][j].v[k], dw);
+                        delta = calcAdam(_network[i][j].past_gradient[k], _network[i][j].squared_gradient[k], dw);
                     }
                 }
                 _network[i][j].weights[k] += delta;
