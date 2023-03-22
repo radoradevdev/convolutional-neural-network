@@ -13,35 +13,81 @@
 #include "Util.h"
 #include "Perceptron.h"
 
+//! Hyperparameters for the Adam function
 #define BETA1 0.9
 #define BETA2 0.999
 #define EPS 1e-7
 
 using namespace std;
 
+//! Fully connected layer class
+/*!
+  The class describes the oprations of a multi layered perceptron
+*/
 class FullyConnectedLayer {
-
 public:
-    FullyConnectedLayer(vector<int> layers, double bias = 1.0, bool adam = true,
-                         double eta = 0.5);
-    void set_weights(vector<vector<vector<double>>> w_init);
-    void print_weights();
-    vector<double> run(vector<double> x);
-    vector<double> bp(vector<double> error);
-    void gd();
-    double Adam(double &m, double &v, double derivative);
+    //! Constructor for initializing the FullyConnected Layer
+    /*!
+      \param layers  the layers, [0] = number of perceptrons
+      \param bias    constant to offset the weights
+      \param adam    padding on all sides, for the kernel to operate
+      \param eta     TODO
+    */
+    FullyConnectedLayer(
+            vector<int> layers,
+            double bias = 1.0,
+            bool adam = true,
+            double eta = 0.5
+            );
 
-    vector<int> layers;
-    double bias;
-    double eta;
+    //! Set the weights
+    /*!
+      \param weights  initial weights, without the input layer
+    */
+    void setWeights(vector<vector<vector<double>>> weights);
 
-    int back_iter;
-    bool b_adam;
+    //! Print the weights
+    void printWeights();
 
-    vector<vector<Perceptron>> network;
-    vector<vector<double>> values;
-    vector<vector<double>> d;
-    vector<vector<double>> loss_gradient;
+    //! Forward propagation
+    /*!
+      \param data   initial weights
+    */
+    vector<double> fwd(vector<double> data);
+
+    //! Backwards propagation
+    /*!
+      \param error_gradient gradient errors
+    */
+    vector<double> bp(vector<double> error_gradient);
+
+    //! Applies the gradient descent, calculates the deltas and updates the weights
+    void applyGradientDescent();
+
+    //! Calculates Adam(Adaptive Moment Estimation)
+    /*!
+      \param past_gradient      past gradient
+      \param squared_gradient   squared gradient
+      \param derivative         derivative
+    */
+    double calcAdam(
+            double &past_gradient,
+            double &squared_gradient,
+            double derivative
+            );
+
+private:
+    vector<int> _sublayers;    /*!< sublayers in the fully connected layer */
+    double _bias;   /*!< constant to offset the weights */
+    double _eta;    /*!< TODO */
+
+    int _back_iter; /*!< backpropagation iterations */
+    bool _b_adam;   /*!< apply adam or not? */
+
+    vector<vector<Perceptron>> _network;    /*!< network of perceptrons */
+    vector<vector<double>> _values;         /*!< values obtained in forward prop */
+    vector<vector<double>> _d;              /*!< values obtained in backward prop */
+    vector<vector<double>> _loss_gradient;  /*!< errors */
 };
 
 #endif

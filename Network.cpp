@@ -68,7 +68,7 @@ void Network::_forward(Elements &image) {
                 _dense_input_shape[2] = image.getParam(2);
             }
 
-            _results = _fulls[0].run(image.getData());
+            _results = _fulls[0].fwd(image.getData());
         }
     }
 }

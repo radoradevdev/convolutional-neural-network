@@ -2,7 +2,6 @@
 
 using namespace std;
 
-// Store a copy of the vectors since they can change outside
 ConvolutionalLayer::ConvolutionalLayer(int image_dim[3], int kernels[4], int padding,
 int stride, double bias, double eta) {
     srand(time(NULL));
@@ -11,7 +10,6 @@ int stride, double bias, double eta) {
         cerr << ("Error: depth of the filter must match the depth of the image.")
              << endl;
 
-    // Warning, copy with array must be used like this (arr + #elements)
     copy(image_dim, image_dim + 3, begin(_image_dim));
     copy(kernels, kernels + 4, begin(_specs));
 
@@ -74,11 +72,10 @@ void ConvolutionalLayer::_adjustOutDimensions() {
 
 void ConvolutionalLayer::fwd(Elements image, Elements &out) {
 
-    /*Produces a volume of size D2xH2xW2 where:
-          #W2=(W1−F+2P)/S+1
-          #H2=(H1−F+2P)/S+1
-          #D2= kernels number
-  */
+    // Produces a volume of size D2xH2xW2 where:
+    //  #W2=(W1−F+2P)/S+1
+    //  #H2=(H1−F+2P)/S+1
+    //  #D2= kernels number
 
     int f_y = _specs[1], f_x = _specs[2], f_d = _specs[3];
     int n_kernel = _specs[0];
@@ -92,7 +89,6 @@ void ConvolutionalLayer::fwd(Elements image, Elements &out) {
         _addPadding(image, _cache);
     else
         _cache = image;
-    // Now image is saved and adjusted in _cache
 
     int y_out = 0, x_out = 0;
 

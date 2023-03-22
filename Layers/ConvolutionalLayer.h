@@ -63,15 +63,16 @@ private:
     int _specs[4] = {2, 3, 3, 1};    /*!< Default kernel spcification */
     int _out_dim[3] = {2, 13, 13};   /*!< TODO */
 
-    int _padding = 1;   /*! Padding on all sides, for the kernel to operate */
-    int _stride = 2;    /*! How many pixels every convolution to shift */
-    int _iteration = 0; /*! TODO Iterations over the Convolutional layer, for 1 epoch */
-    double _eta = 0.1;  /*! TODO */
+    int _padding = 1;   /*!< Padding on all sides, for the kernel to operate */
+    int _stride = 2;    /*!< How many pixels every convolution to shift */
+    int _iteration = 0; /*!< TODO Iterations over the Convolutional layer, for 1 epoch */
+    double _eta = 0.1;  /*!< TODO */
 
-    vector<double> _bias; /*! TODO Constant to offset the weights */
+    vector<double> _bias; /*!< TODO Constant to offset the weights */
 
-    Elements _cache;
-    Elements _filter;
+    Elements _cache;    /*!< the cached forward elements */
+    Elements _filter;   /*!< firstly, it holds randomized values and
+                            then it holds the result of the gradient descent */
 
     //! Enlarge the image and _image_dim is changed accordingly
     /*!

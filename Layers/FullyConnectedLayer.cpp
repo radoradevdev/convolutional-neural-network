@@ -1,42 +1,47 @@
 #include "FullyConnectedLayer.h"
 
-// Return a new MultiLayerPerceptron object with the specified parameters.
-FullyConnectedLayer::FullyConnectedLayer(vector<int> layers, double bias,
-                                           bool adam, double eta) {
+FullyConnectedLayer::FullyConnectedLayer(
+        vector<int> layers,
+        double bias,
+        bool adam,
+        double eta
+        ) {
 
     srand(time(NULL));
 
-    this->layers = layers;
-    this->bias = bias;
-    this->eta = eta;
-    back_iter = 0;
-    b_adam = adam;
+    _sublayers = layers;
+    _bias = bias;
+    _eta = eta;
+    _back_iter = 0;
+    _b_adam = adam;
 
     for (int i = 0; i < (int)layers.size(); i++) {
-        values.push_back(vector<double>(layers[i], 0.0));
-        d.push_back(vector<double>(layers[i], 0.0));
-        loss_gradient.push_back(vector<double>(layers[i], 0.0));
-        network.push_back(vector<Perceptron>());
-        if (i > 0) // network[0] is the input layer,so it has no neurons
-            for (int j = 0; j < layers[i]; j++)
-                network[i].push_back(Perceptron(layers[i - 1], bias));
+        _values.push_back(vector<double>(layers[i], 0.0));
+        _d.push_back(vector<double>(layers[i], 0.0));
+        _loss_gradient.push_back(vector<double>(layers[i], 0.0));
+        _network.push_back(vector<Perceptron>());
+        if (i > 0) { // network[0] is the input layer, so it doesn't have neurons
+            for (int j = 0; j < layers[i]; j++) {
+                _network[i].push_back(Perceptron(layers[i - 1], bias));
+            }
+        }
     }
 }
 
-// Set the weights. w_init is a vector of vectors of vectors with the weights
-// for all but the input layer.
-void FullyConnectedLayer::set_weights(vector<vector<vector<double>>> w_init) {
-    for (int i = 0; i < (int)w_init.size(); i++)
-        for (int j = 0; j < (int)w_init[i].size(); j++)
-            network[i + 1][j].set_weights(w_init[i][j]);
+void FullyConnectedLayer::setWeights(vector<vector<vector<double>>> weights) {
+    for (int i = 0; i < (int)weights.size(); i++) {
+        for (int j = 0; j < (int)weights[i].size(); j++) {
+            _network[i + 1][j].setWeights(weights[i][j]);
+        }
+    }
 }
 
-void FullyConnectedLayer::print_weights() {
+void FullyConnectedLayer::printWeights() {
     cout << endl;
-    for (int i = 1; i < (int)network.size(); i++) {
-        for (int j = 0; j < layers[i]; j++) {
+    for (int i = 1; i < (int)_network.size(); i++) {
+        for (int j = 0; j < _sublayers[i]; j++) {
             cout << "Layer " << i + 1 << " Neuron " << j << ": ";
-            for (auto &it : network[i][j].weights)
+            for (auto &it : _network[i][j].weights)
                 cout << it << "   ";
             cout << endl;
         }
@@ -44,78 +49,84 @@ void FullyConnectedLayer::print_weights() {
     cout << endl;
 }
 
-// Feed a sample x into the MultiLayer Perceptron.
-vector<double> FullyConnectedLayer::run(vector<double> x) {
+vector<double> FullyConnectedLayer::fwd(vector<double> data) {
 
-    values[0] = x;
-    for (int i = 1; i < (int)network.size(); i++)
-        for (int j = 0; j < layers[i]; j++)
-            values[i][j] = network[i][j].run(values[i - 1]);
-    return values.back();
+    _values[0] = data;
+    for (int i = 1; i < (int)_network.size(); i++) {
+        for (int j = 0; j < _sublayers[i]; j++) {
+            _values[i][j] = _network[i][j].run(_values[i - 1]);
+        }
+    }
+    return _values.back();
 }
 
-// NB m and v are updated inside the function
-double FullyConnectedLayer::Adam(double &m, double &v, double derivative) {
+double FullyConnectedLayer::calcAdam(
+        double &past_gradient,
+        double &squared_gradient,
+        double derivative
+        ) {
 
-    int t = back_iter;
+    int t = _back_iter;
     double dx = derivative;
 
-    m = BETA1 * m + (1 - BETA1) * dx;
-    double mt = m / (1 - (double)pow(BETA1, t));
-    v = BETA2 * v + (1 - BETA2) * ((double)pow(dx, 2));
-    double vt = v / (1 - (double)pow(BETA2, t));
-    double delta = eta * mt / (sqrt(vt) + EPS);
+    past_gradient = BETA1 * past_gradient + (1 - BETA1) * dx;
+    double mt = past_gradient / (1 - (double)pow(BETA1, t));
+    squared_gradient = BETA2 * squared_gradient + (1 - BETA2) * ((double)pow(dx, 2));
+    double vt = squared_gradient / (1 - (double)pow(BETA2, t));
+    double delta = _eta * mt / (sqrt(vt) + EPS);
 
     return delta;
 }
 
-void FullyConnectedLayer::gd() {
-
-    // STEPS 5 & 6: Calculate the deltas and update the weights
-    for (int i = 1; i < (int)network.size(); i++)
-        for (int j = 0; j < layers[i]; j++)
-            for (int k = 0; k < layers[i - 1] + 1; k++) {
+void FullyConnectedLayer::applyGradientDescent() {
+    for (int i = 1; i < (int)_network.size(); i++)
+        for (int j = 0; j < _sublayers[i]; j++)
+            for (int k = 0; k < _sublayers[i - 1] + 1; k++) {
                 double delta;
-                if (k == layers[i - 1]) {
-                    delta = eta * d[i][j];
+                if (k == _sublayers[i - 1]) {
+                    delta = _eta * _d[i][j];
                 } else {
 
-                    double dw = d[i][j] * values[i - 1][k]; // dw = dscore * X
+                    double dw = _d[i][j] * _values[i - 1][k]; // dw = dscore * X
 
-                    if (!b_adam)
-                        delta = eta * dw; // learning rate * dw
-                    else
-                        delta = Adam(network[i][j].m[k], network[i][j].v[k], dw);
+                    if (!_b_adam) {
+                        delta = _eta * dw; // learning rate * dw
+                    } else {
+                        delta = calcAdam(_network[i][j].m[k], _network[i][j].v[k], dw);
+                    }
                 }
-                network[i][j].weights[k] += delta;
+                _network[i][j].weights[k] += delta;
             }
 }
 
-vector<double> FullyConnectedLayer::bp(vector<double> error) {
+vector<double> FullyConnectedLayer::bp(vector<double> error_gradient) {
 
-    back_iter++; // To update Adam
+    _back_iter++; // Updates adam result
 
-    vector<double> outputs = values.back();
+    vector<double> outputs = _values.back();
 
-    // STEP 3: Calculate the output error terms
-    for (int i = 0; i < (int)outputs.size(); i++)
-        d.back()[i] = outputs[i] * (1 - outputs[i]) * (error[i]);
+    // Calculate the output error
+    for (int i = 0; i < (int)outputs.size(); i++) {
+        _d.back()[i] = outputs[i] * (1 - outputs[i]) * (error_gradient[i]);
+    }
 
-    // STEP 4: Calculate the error term of each unit on each layer
-    for (int i = ((int)network.size()) - 2; i > 0; i--)
+    // Calculate the error term of each unit on each layer
+    for (int i = ((int)_network.size()) - 2; i > 0; i--) {
 
-        for (int h = 0; h < (int)network[i].size(); h++) {
+        for (int h = 0; h < (int)_network[i].size(); h++) {
 
             double fwd_error = 0.0;
 
-            for (int k = 0; k < layers[i + 1]; k++)
-                fwd_error += network[i + 1][k].weights[h] * d[i + 1][k];
+            for (int k = 0; k < _sublayers[i + 1]; k++) {
+                fwd_error += _network[i + 1][k].weights[h] * _d[i + 1][k];
+            }
 
-            loss_gradient[i][h] = fwd_error;
-            d[i][h] = values[i][h] * (1 - values[i][h]) * fwd_error;
+            _loss_gradient[i][h] = fwd_error;
+            _d[i][h] = _values[i][h] * (1 - _values[i][h]) * fwd_error;
         }
+    }
 
-    gd();
+    applyGradientDescent();
 
-    return loss_gradient[1]; // Result from the first layer (not the input one)
+    return _loss_gradient[1]; // Result from the first layer (not the input one)
 }
