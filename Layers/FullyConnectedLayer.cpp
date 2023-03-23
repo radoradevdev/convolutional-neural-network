@@ -41,7 +41,7 @@ void FullyConnectedLayer::printWeights() {
     for (int i = 1; i < (int)_network.size(); i++) {
         for (int j = 0; j < _sublayers[i]; j++) {
             cout << "Layer " << i + 1 << " Neuron " << j << ": ";
-            for (auto &it : _network[i][j].weights)
+            for (auto &it : _network[i][j]._weights)
                 cout << it << "   ";
             cout << endl;
         }
@@ -92,10 +92,10 @@ void FullyConnectedLayer::applyGradientDescent() {
                     if (!_b_adam) {
                         delta = _eta * dw; // learning rate * dw
                     } else {
-                        delta = calcAdam(_network[i][j].past_gradient[k], _network[i][j].squared_gradient[k], dw);
+                        delta = calcAdam(_network[i][j]._past_gradient[k], _network[i][j]._squared_gradient[k], dw);
                     }
                 }
-                _network[i][j].weights[k] += delta;
+                _network[i][j]._weights[k] += delta;
             }
 }
 
@@ -118,7 +118,7 @@ vector<double> FullyConnectedLayer::bp(vector<double> error_gradient) {
             double fwd_error = 0.0;
 
             for (int k = 0; k < _sublayers[i + 1]; k++) {
-                fwd_error += _network[i + 1][k].weights[h] * _d[i + 1][k];
+                fwd_error += _network[i + 1][k]._weights[h] * _d[i + 1][k];
             }
 
             _loss_gradient[i][h] = fwd_error;

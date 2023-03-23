@@ -114,6 +114,20 @@ private:
                                 (layers, height, width, depth) */
     int _params_length = 0, /*!< Parameters length */
         _length = 0;        /*!< Length of the data */
+
+    //! (Helper function) Initialize after constructor
+    /*!
+      \param params parameters of the Elements
+      \param length length of the parameters
+    */
+    void _init(const int *params, int length);
+
+    //! (Helper function) Find element to be assigned or get
+    /*!
+      \param index  index on which to assign
+      \param length length of the parameters
+    */
+    int _find(int *index, int length);
 };
 
 #endif

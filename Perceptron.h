@@ -1,7 +1,7 @@
 #ifndef PERCEPTRON_H
 #define PERCEPTRON_H
 
-#include <numeric>
+#include <numeric> // because of inner_product
 #include <vector>
 
 #include "Util.h"
@@ -39,9 +39,9 @@ public:
     */
     double sigmoid(double x);
 
-    vector<double> weights,             /*!< weights */
-                    past_gradient,      /*!< past gradients */
-                    squared_gradient;   /*!< squared gradients */
+    vector<double> _weights,             /*!< weights */
+                    _past_gradient,      /*!< past gradients */
+                    _squared_gradient;   /*!< squared gradients */
 private:
     double _bias;                       /*!< constant to offset the weights */
 };

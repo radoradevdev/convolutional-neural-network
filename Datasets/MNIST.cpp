@@ -10,7 +10,9 @@ void MNIST::loadExpectedValues(
     ifstream file(path, ios::binary);
 
     if (file.is_open()) {
-        int magic_number = 0;
+        int magic_number = 0; /**< magic number is a sequence of
+                                bytes at the beginning of a file that indicates
+                                its file type or format. */
         int number_of_images = 0;
 
         file.read((char *)&magic_number, sizeof(magic_number));
@@ -25,6 +27,7 @@ void MNIST::loadExpectedValues(
             values[indx_val] = (int)temp;
         }
 
+        // Also load the validation set
         if (hasValid) {
             for (int indx_val = len+1; indx_val < number_of_images; ++indx_val) {
                 unsigned char temp = 0;
@@ -46,7 +49,9 @@ void MNIST::loadDataset(
     ifstream file(path, ios::binary);
 
     if (file.is_open()) {
-        int magic_number = 0;
+        int magic_number = 0; /**< magic number is a sequence of
+                                bytes at the beginning of a file that indicates
+                                its file type or format. */
         int number_of_images = 0;
         int n_rows = 0;
         int n_cols = 0;
@@ -71,6 +76,7 @@ void MNIST::loadDataset(
             }
         }
 
+        // Also load the validation set
         if (hasValid) {
             for (int indx_img = len+1; indx_img < number_of_images; ++indx_img) {
                 for (int indx_row = 0; indx_row < n_rows; ++indx_row) {
@@ -113,7 +119,7 @@ void MNIST::getDataset(Elements &Train_DS, vector<int> &Train_EV,
 
     initDataset(Train_DS, Train_EV, Valid_DS, Valid_EV, Test_DS, Test_EV);
 
-    cout << "\no Loading MNIST datasets" << endl;
+    cout << "\n> Loading MNIST datasets" << endl;
 
     string path_to_folder = "/Users/radoslavradev/Sites/bachelor-thesis/"
                             "bachelor-thesis-source-code/MNIST_data/";

@@ -1,6 +1,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+// Hyperparameter for the relu function
 #define ALPHA 0.001
 #define DIMS 4
 
@@ -14,9 +15,9 @@ class Util {
 public:
     // Activation functions
 
-    //! ReLU stands for Rectified Linear Unit,
+    //! Leaky ReLU stands for Leaky Rectified Linear Unit,
     //! which is a type of activation function used in neural networks.
-    //! It is defined as the function f(x) = max(0, x),
+    //! It is defined as the function f(x) = max(alpha*x, x),
     //! where x is the input to the function.
     /*!
       \param data   elements data
@@ -31,7 +32,8 @@ public:
 
     // Dataset helpers
 
-    //! TODO
+    //! Converts an integer i into its equivalent 4-byte
+    //! representation as a sequence of unsigned characters
     static int reverseInt(int i);
 
     //! Generates a random float number

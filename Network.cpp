@@ -11,6 +11,7 @@ void Network::addConvolutionalLayer(
     int *dim_ptr = &image_dim[0];
     int *ker_ptr = &kernels[0];
 
+    // Initialise the convolutional layer with the hyperparameters
     ConvolutionalLayer layer(dim_ptr, ker_ptr, padding, stride, bias, eta);
     _convs.push_back(layer);
     _layers.push_back(LayerType::Conv);
@@ -30,6 +31,7 @@ void Network::addFullyConnectedLayer(
     layers.push_back(num_classes); // output layer
     // At this point layers = { input, hidden, num_classes }
 
+    // Initialise the fully connected layer with the hyperparameters
     FullyConnectedLayer layer(layers, bias, adam, eta);
     _fulls.push_back(layer);
     _num_clss = num_classes;
@@ -56,18 +58,23 @@ void Network::_forward(Elements &image) {
     // Go through all layers
     for (int layer_indx = 0; layer_indx < _total_lrs; layer_indx++) {
         if (_layers[layer_indx] == LayerType::Conv) {
+            // Forward convolution
             _convs[_conv_indx].fwd(image, img_out);
-            _conv_indx++; // move the conv_indx forward, because there can be more than one conv layers
+
+            // move the conv_indx forward,
+            // because there can be more than one conv layers
+            _conv_indx++;
+
             image = img_out;
         } else if (_layers[layer_indx] == LayerType::Pool) {
         } else if (_layers[layer_indx] == LayerType::Full) {
 
             if (_dense_input_shape[0] == 0) {
-                _dense_input_shape[0] = image.getParam(0);
-                _dense_input_shape[1] = image.getParam(1);
-                _dense_input_shape[2] = image.getParam(2);
+                _dense_input_shape[0] = image.getParam(0); // layers
+                _dense_input_shape[1] = image.getParam(1); // height
+                _dense_input_shape[2] = image.getParam(2); // width
             }
-
+            // Forward propagation
             _results = _fulls[0].fwd(image.getData());
         }
     }
@@ -79,10 +86,13 @@ void Network::_backward(vector<double> &gradient) {
     for (int layer_indx = _total_lrs - 1; layer_indx >= 0; layer_indx--) {
         if (_layers[layer_indx] == LayerType::Conv) {
             _conv_indx--;
+
+            // Backwards convolution
             _convs[_conv_indx].bp(img_in, img_out);
             img_in = img_out;
         } else if (_layers[layer_indx] == LayerType::Pool) {
         } else if (_layers[layer_indx] == LayerType::Full) {
+            // Backwards propagation
             gradient = _fulls[0].bp(gradient);
 
             img_in.init(_dense_input_shape, 3);
@@ -129,10 +139,12 @@ void Network::_iterate(
 
     for (int sample_indx = 0; sample_indx < dataset_size; sample_indx++) {
 
+        // Load the image
         _getImage(image, dataset, sample_indx);
+        // Load the expected value class
         expected_value = expected_values[sample_indx];
 
-        // the result is stored in _results
+        // the result of the forward propagation is stored in _results
         _conv_indx = 0;
         _forward(image);
 
@@ -196,33 +208,10 @@ void Network::_iterate(
 
 void Network::train(int epochs, int preview_interval) {
 
-    /* Instead of computing the gradient over the entire dataset (batch gradient descent),
-    the SGD algorithm computes the gradient over a
-    randomly selected subset of the data (mini-batch).
-    This approach makes the computation of the gradient more efficient
-    and reduces the variance of the gradient estimate.
-
-    The basic steps of the SGD algorithm are:
-
-    Initialize the model parameters with small random values.
-
-    Repeat until convergence:
-
-    a. Select a mini-batch of samples from the training dataset.
-
-    b. Compute the gradient of the loss function with respect to the parameters
-    for the selected mini-batch.
-
-    c. Update the parameters by taking a small step in the direction
-    of the negative gradient.
-
-    d. Evaluate the model on the validation dataset to monitor its performance
-    and prevent overfitting. */
-
-    cout << "\n\no Traininig: " << endl;
+    cout << "\n\n> Traininig: " << endl;
 
     for (int epoch = 0; epoch < epochs; epoch++) {
-        cout << "\n\to Epoch " << epoch + 1 << endl;
+        cout << "\n\t> Epoch " << epoch + 1 << endl;
         _iterate(Train_DS, Train_EV, train_loss, train_acc, preview_interval, true);
 
         cout<<("\nValidating:\n")<<endl;
@@ -232,19 +221,20 @@ void Network::train(int epochs, int preview_interval) {
 }
 
 void Network::test(int preview_interval) {
-    cout << ("\n\no Testing:") << endl;
+    cout << ("\n\n> Testing:") << endl;
     _iterate(Test_DS, Test_EV, test_loss, test_acc, preview_interval, false);
 }
 
 void Network::checkConfiguration(int set_size, int epochs) {
-    cout << ("\no Performing check:\n") << endl;
+    cout << ("\n> Performing check:\n") << endl;
 
-    vector<int> check_EV;
+    vector<int> Check_EV;
     vector<double> check_loss, check_acc;
 
     Elements check_DS(set_size, _image_shape[0], _image_shape[1],
             _image_shape[2]);
 
+    // Loading the temporary Check_DS and Check_EV
     for (int sample = 0; sample < set_size; sample++) {
         double val;
         for (int d = 0; d < _image_shape[0]; ++d) {
@@ -257,14 +247,15 @@ void Network::checkConfiguration(int set_size, int epochs) {
             }
         }
 
-        check_EV.push_back(Test_EV[sample]);
+        Check_EV.push_back(Test_EV[sample]);
     }
 
+    // test with Check_DS and Check_EV
     for (int epoch = 0; epoch < epochs; epoch++) {
         check_loss.clear();
         check_acc.clear();
-        printf("\r\to Epoch %d  ||", (epoch + 1));
-        _iterate(check_DS, check_EV, check_loss, check_acc, (set_size - 1), true);
+        printf("\r\t> Epoch %d  ||", (epoch + 1));
+        _iterate(check_DS, Check_EV, check_loss, check_acc, (set_size - 1), true);
     }
 
     double loss_avg = 0.0;
@@ -272,5 +263,6 @@ void Network::checkConfiguration(int set_size, int epochs) {
         loss_avg += check_loss[i] / check_loss.size();
     }
 
+    // The losses should be closed to 0
     printf("\n\n\tFinal losses: %02.2f", loss_avg);
 }
