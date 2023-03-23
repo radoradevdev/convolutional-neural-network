@@ -74,7 +74,7 @@ public:
       \param index          TODO
       \param params_length  length of the parameters
     */
-    double getValue(int *index, int params_length);
+    double getValue(int *index, int params_length) const;
 
     //! Get data, getter
     vector<double>& getData();
@@ -127,7 +127,7 @@ private:
       \param index  index on which to assign
       \param length length of the parameters
     */
-    int _find(int *index, int length);
+    int _find(int *index, int length) const;
 };
 
 #endif

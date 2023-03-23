@@ -71,7 +71,7 @@ void Elements::_init(const int *params, int length) {
     }
 }
 
-int Elements::_find(int *index, int length) {
+int Elements::_find(int *index, int length) const {
     int element = 0, offset = 1;
 
     for (int indx = 0; indx < length; indx++) {
@@ -104,7 +104,7 @@ void Elements::assign(double val, int *index, int length) {
     }
 }
 
-double Elements::getValue(int *index, int params_length) {
+double Elements::getValue(int *index, int params_length) const {
     double res = -1;
 
     if (params_length != _params_length) {

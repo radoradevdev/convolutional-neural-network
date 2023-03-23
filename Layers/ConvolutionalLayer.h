@@ -50,7 +50,7 @@ public:
       \param image  original image
       \param out    result
     */
-    void fwd(Elements image, Elements &out);
+    void fwd(const Elements &image, Elements &out);
 
     //! Backwards propagation in the convolutional layer
     /*!
@@ -79,7 +79,7 @@ private:
      \param image  original image
       \param out    result
     */
-    void _addPadding(Elements &image, Elements &out);
+    void _addPadding(const Elements &image, Elements &out);
 
     //! Applies the gradient descent
     /*!

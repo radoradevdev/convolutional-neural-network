@@ -34,7 +34,7 @@ int stride, double bias, double eta) {
         _filter[i] = ((double)(arc4random() % 100)) / 1000;
 }
 
-void ConvolutionalLayer::_addPadding(Elements &image, Elements &out) {
+void ConvolutionalLayer::_addPadding(const Elements &image, Elements &out) {
 
     for (int D = 0; D < _image_dim[0]; D++)
         for (int H = 0; H < _image_dim[1] - 2 * _padding; H++)
@@ -70,7 +70,7 @@ void ConvolutionalLayer::_adjustOutDimensions() {
     // _out_dim[2] );
 }
 
-void ConvolutionalLayer::fwd(Elements image, Elements &out) {
+void ConvolutionalLayer::fwd(const Elements& image, Elements &out) {
 
     // Produces a volume of size D2xH2xW2 where:
     //  #W2=(W1−F+2P)/S+1
