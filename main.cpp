@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     network.checkConfiguration();
 
     // train the network
-    network.train(epochs = 1, 10);
+    network.train(epochs = 5, 10);
 
     // test the network, with another set
     network.test(10);
