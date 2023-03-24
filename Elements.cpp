@@ -71,7 +71,7 @@ void Elements::_init(const int *params, int length) {
     }
 }
 
-int Elements::_find(int *index, int length) const {
+int Elements::_find(int *indices, int length) const {
     int element = 0, offset = 1;
 
     for (int indx = 0; indx < length; indx++) {
@@ -80,13 +80,13 @@ int Elements::_find(int *index, int length) const {
             offset *= _params[params_indx];
         }
 
-        element += index[indx] * offset;
+        element += indices[indx] * offset;
     }
 
     return element;
 }
 
-void Elements::assign(double val, int *index, int length) {
+void Elements::assign(double val, int *indices, int length) {
 
     if (length != _params_length) {
         // TODO decide on errors (Incorrect params length)
@@ -99,12 +99,12 @@ void Elements::assign(double val, int *index, int length) {
 
         // When _params_length = 2:
         // _data[h + w*h]
-        int element = _find(index, length);
+        int element = _find(indices, length);
         _data[element] = val;
     }
 }
 
-double Elements::getValue(int *index, int params_length) const {
+double Elements::getValue(int *indices, int params_length) const {
     double res = -1;
 
     if (params_length != _params_length) {
@@ -119,7 +119,7 @@ double Elements::getValue(int *index, int params_length) const {
         // When _params_length = 2:
         // _data[h + w*h]
 
-        int element = _find(index, params_length);
+        int element = _find(indices, params_length);
 
         res = _data[element];
     }
@@ -127,7 +127,7 @@ double Elements::getValue(int *index, int params_length) const {
     return res;
 }
 
-void Elements::add(double val, int *index, int length) {
+void Elements::add(double val, int *indices, int length) {
     if (length != _params_length) {
         // TODO decide on errors (Incorrect params length)
     } else {
@@ -139,18 +139,7 @@ void Elements::add(double val, int *index, int length) {
 
         // When _params_length = 2:
         // _data[h + w*h]
-        // TODO
-        int element = 0, offset = 1;
-
-        for (int indx = 0; indx < length; indx++) {
-            offset = 1;
-            for (int params_indx = 0; params_indx < indx; params_indx++) {
-                offset *= _params[params_indx];
-            }
-
-            // TODO index[indx]
-            element += index[indx] * offset;
-        }
+        int element = _find(indices, length);
 
         _data[element] += val;
     }

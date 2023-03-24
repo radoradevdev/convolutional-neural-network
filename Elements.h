@@ -71,29 +71,29 @@ public:
 
     //! Get value
     /*!
-      \param index          TODO
+      \param indices          TODO
       \param params_length  length of the parameters
     */
-    double getValue(int *index, int params_length) const;
+    double getValue(int *indices, int params_length) const;
 
     //! Get data, getter
     vector<double>& getData();
 
     //! Assign value to a specific position in the data vector
     /*!
-      \param val    value to be inserted
-      \param index  index on which to assign
-      \param length length of the parameters
+      \param val        value to be inserted
+      \param indices    index on which to assign
+      \param length     length of the parameters
     */
-    void assign(double val, int *index, int length);
+    void assign(double val, int *indices, int length);
 
     //! Add a value to a specific position in the data vector, Sum
     /*!
-      \param val    value to be added
-      \param index  index on which to assign
-      \param length length of the parameters
+      \param val        value to be added
+      \param indices    index on which to assign
+      \param length     length of the parameters
     */
-    void add(double val, int *index, int length);
+    void add(double val, int *indices, int length);
 
     //! Overloaded assignment operator
     /*!
@@ -127,7 +127,7 @@ private:
       \param index  index on which to assign
       \param length length of the parameters
     */
-    int _find(int *index, int length) const;
+    int _find(int *indices, int length) const;
 };
 
 #endif
