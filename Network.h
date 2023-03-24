@@ -41,7 +41,7 @@ public:
       \param padding    padding on all sides, for the kernel to operate
       \param stride     how many pixels every convolution to shift
       \param bias       constant to offset the weights
-      \param eta        TODO
+      \param eta        learning rate parameter, size of step towards loss=0
     */
     void addConvolutionalLayer(
             vector<int> &image_dim,
@@ -69,7 +69,7 @@ public:
       \param num_classes    number of classes to classified
       \param bias           constant to offset the weights
       \param adam           apply adam function?
-      \param eta            TODO
+      \param eta            learning rate parameter, size of step towards loss=0
     */
     void addFullyConnectedLayer(
             int input,

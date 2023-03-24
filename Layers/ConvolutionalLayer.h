@@ -28,7 +28,7 @@ public:
       \param padding    padding on all sides, for the kernel to operate
       \param stride     how many pixels every convolution to shift
       \param bias       constant to offset the weights
-      \param eta        TODO
+      \param eta        learning rate parameter, size of step towards loss=0
     */
     ConvolutionalLayer(
             int image_dim[3],
@@ -41,7 +41,7 @@ public:
 
     //! Adds a new epoch
     /*!
-      \param eta    TODO
+      \param eta    learning rate parameter, size of step towards loss=0
     */
     void addEpoch(double eta);
 
@@ -59,14 +59,14 @@ public:
     */
     void bp(Elements out, Elements &image);
 private:
-    int _image_dim[3] = {1, 16, 16}; /*!< Default image specification */
-    int _specs[4] = {2, 3, 3, 1};    /*!< Default kernel spcification */
-    int _out_dim[3] = {2, 13, 13};   /*!< TODO */
+    int _image_dim[3] = {1, 16, 16};    /*!< Default image specification */
+    int _kernels[4] = {2, 3, 3, 1};     /*!< Default kernel spcification */
+    int _out_dim[3] = {2, 13, 13};      /*!< depth, height, width */
 
     int _padding = 1;   /*!< Padding on all sides, for the kernel to operate */
     int _stride = 2;    /*!< How many pixels every convolution to shift */
     int _iteration = 0; /*!< TODO Iterations over the Convolutional layer, for 1 epoch */
-    double _eta = 0.1;  /*!< TODO */
+    double _eta = 0.1;  /*!< learning rate parameter, size of step towards loss=0 */
 
     vector<double> _bias; /*!< TODO Constant to offset the weights */
 
@@ -76,7 +76,7 @@ private:
 
     //! Enlarge the image and _image_dim is changed accordingly
     /*!
-     \param image  original image
+     \param image   original image
       \param out    result
     */
     void _addPadding(const Elements &image, Elements &out);

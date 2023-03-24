@@ -31,7 +31,7 @@ public:
       \param layers  the layers, [0] = number of perceptrons
       \param bias    constant to offset the weights
       \param adam    padding on all sides, for the kernel to operate
-      \param eta     TODO
+      \param eta     learning rate parameter, size of step towards loss=0
     */
     FullyConnectedLayer(
             vector<int> layers,
@@ -79,7 +79,7 @@ public:
 private:
     vector<int> _sublayers;    /*!< sublayers in the fully connected layer */
     double _bias;   /*!< constant to offset the weights */
-    double _eta;    /*!< TODO */
+    double _eta;    /*!< learning rate parameter, size of step towards loss=0 */
 
     int _back_iter; /*!< backpropagation iterations */
     bool _b_adam;   /*!< apply adam or not? */
