@@ -6,9 +6,9 @@ ConvolutionalLayer::ConvolutionalLayer(int image_dim[3], int kernels[4], int pad
 int stride, double bias, double eta) {
     srand(time(NULL));
 
-    if (image_dim[0] != kernels[3])
-        cerr << ("Error: depth of the filter must match the depth of the image.")
-             << endl;
+    if (image_dim[0] != kernels[3]) {
+        // TODO decide on errors (depth of the filter must match the depth of the image.)
+    }
 
     copy(image_dim, image_dim + 3, begin(_image_dim));
     copy(kernels, kernels + 4, begin(_specs));
