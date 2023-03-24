@@ -92,7 +92,7 @@ void MNIST::loadDataset(
 
         cout << "\n\tDatasets loaded" << endl;
     } else {
-        cerr << "Error: The dataset could not be found." << endl;
+        // TODO decide on errors (The dataset could not be found.)
     }
 }
 
