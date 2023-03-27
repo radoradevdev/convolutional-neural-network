@@ -34,6 +34,9 @@ public:
     void setWeights(vector<double> init_weights);
 
     //! Sigmoid activation function
+    //! The sigmoid function maps input values to an output value
+    //! between 0 and 1, which is useful for modeling binary
+    //! outcomes or probabilities.
     /*!
       \param x  value
     */
