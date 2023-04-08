@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string.h>
 #include <vector>
+#include <QTextStream>
 
 #include "Datasets/MNIST.h"
 #include "Layers/ConvolutionalLayer.h"
@@ -54,9 +55,16 @@ public:
             );
 
     //! TODO Adds a Pooling Layer
+    /*!
+     * \param image_dim     image dimensions
+     * \param mode          method of pooling
+     * \param size          size of pooling
+     * \param stride        stride of pooling
+     * \param padding       padding of pooling
+     */
     void addPoolingLayer(
-            int image_dim[3],
-            char mode = 'a',
+            vector<int> &image_dim,
+            string mode = "avg",
             int size = 2,
             int stride = 2,
             int padding = 0

@@ -18,6 +18,22 @@ void Network::addConvolutionalLayer(
     _total_lrs++;
 }
 
+void Network::addPoolingLayer(
+        vector<int> &image_dim,
+        string mode,
+        int size,
+        int stride,
+        int padding
+        )
+{
+    int *dim_ptr = &image_dim[0];
+
+    PoolingLayer layer(dim_ptr, mode, size, stride, padding);
+    _pools.push_back(layer);
+    _layers.push_back(LayerType::Pool);
+    _total_lrs++;
+}
+
 void Network::addFullyConnectedLayer(
         int input,
         vector<int> &hidden,
@@ -67,6 +83,14 @@ void Network::_forward(Elements &image) {
 
             image = img_out;
         } else if (_layers[layer_indx] == LayerType::Pool) {
+            // Forward convolution
+            _pools[_conv_indx].fwd(image, img_out);
+
+            // move the pool_indx forward,
+            // because there can be more than one pool layers
+            _pool_indx++;
+
+            image = img_out;
         } else if (_layers[layer_indx] == LayerType::Full) {
 
             if (_dense_input_shape[0] == 0) {
@@ -91,6 +115,11 @@ void Network::_backward(vector<double> &gradient) {
             _convs[_conv_indx].bp(img_in, img_out);
             img_in = img_out;
         } else if (_layers[layer_indx] == LayerType::Pool) {
+            _pool_indx--;
+
+            // Backwards convolution
+            _pools[_pool_indx].bp(img_in, img_out);
+            img_in = img_out;
         } else if (_layers[layer_indx] == LayerType::Full) {
             // Backwards propagation
             gradient = _fulls[0].bp(gradient);
@@ -189,18 +218,20 @@ void Network::_iterate(
         if (b_training) {
             _backward(error);
         }
-
         if (sample_indx % preview_interval == 0 && sample_indx != 0) {
             double left, total;
             time_t elapsed;
             time(&elapsed);
             total = (double)(elapsed - t_start) / sample_indx * dataset_size;
             left = total - (double)(elapsed - t_start);
-            printf("\t  Accuracy: %02.2f - Loss: %02.2f - Sample %04d  ||  Label: %d "
-                   "- Prediction: %d  ||  Elapsed time: %02.2f - Left time: %02.2f - "
-                   "Total time: %02.2f \r",
-                   accuracy, loss, sample_indx, expected_value, (int)res, (double)elapsed - t_start,
-                   left, total);
+            QTextStream(stdout) << "\t  Accuracy: " << loss << " - "
+                << "Loss: " << accuracy << " - "
+                << "Sample " << sample_indx << " || "
+                << "Label: " << expected_value << " - "
+                << "Prediction: " << (int)res << " || "
+                << "Elapsed time: " << (double)elapsed - t_start << " - "
+                << "Left time: " << left << " - "
+                << "Total time: " << total << "\r";
         }
     }
 }
@@ -208,25 +239,25 @@ void Network::_iterate(
 
 void Network::train(int epochs, int preview_interval) {
 
-    cout << "\n\n> Traininig: " << endl;
+    QTextStream(stdout) <<"\n\n> Traininig: " << Qt::endl;
 
     for (int epoch = 0; epoch < epochs; epoch++) {
-        cout << "\n\t> Epoch " << epoch + 1 << endl;
+        QTextStream(stdout) << "\n\t> Epoch " << epoch + 1 << Qt::endl;
         _iterate(Train_DS, Train_EV, train_loss, train_acc, preview_interval, true);
 
-        cout<<("\nValidating:\n")<<endl;
+        QTextStream(stdout) << ("\nValidating:\n") << Qt::endl;
         // the model evaluation is performed on the validation set after every epoch
         _iterate(Valid_DS, Valid_EV, valid_loss, valid_acc, preview_interval, false);
     }
 }
 
 void Network::test(int preview_interval) {
-    cout << ("\n\n> Testing:") << endl;
+    QTextStream(stdout) <<("\n\n> Testing:") << Qt::endl;
     _iterate(Test_DS, Test_EV, test_loss, test_acc, preview_interval, false);
 }
 
 void Network::checkConfiguration(int set_size, int epochs) {
-    cout << ("\n> Performing check:\n") << endl;
+    QTextStream(stdout) << ("\n> Performing check:\n") << Qt::endl;
 
     vector<int> Check_EV;
     vector<double> check_loss, check_acc;
@@ -254,8 +285,8 @@ void Network::checkConfiguration(int set_size, int epochs) {
     for (int epoch = 0; epoch < epochs; epoch++) {
         check_loss.clear();
         check_acc.clear();
-        printf("\r\t> Epoch %d  ||", (epoch + 1));
-        _iterate(check_DS, Check_EV, check_loss, check_acc, (set_size - 1), true);
+        QTextStream(stdout) << "\t> Epoch " << (epoch + 1) << " ||";
+        _iterate(check_DS, Check_EV, check_loss, check_acc, (set_size - 2), true);
     }
 
     double loss_avg = 0.0;
@@ -264,5 +295,5 @@ void Network::checkConfiguration(int set_size, int epochs) {
     }
 
     // The losses should be closed to 0
-    printf("\n\n\tFinal losses: %02.2f", loss_avg);
+   QTextStream(stdout) << "\n\n\tFinal losses: " <<  loss_avg;
 }

@@ -1,5 +1,7 @@
 #include "MNIST.h"
 
+#include <QTextStream>
+
 void MNIST::loadExpectedValues(
         string path,
         vector<int> &values,
@@ -90,7 +92,7 @@ void MNIST::loadDataset(
             }
         }
 
-        cout << "\n\tDatasets loaded" << endl;
+        QTextStream(stdout) << "\n\tDatasets loaded" << Qt::endl;
     } else {
         // TODO decide on errors (The dataset could not be found.)
     }
@@ -119,7 +121,7 @@ void MNIST::getDataset(Elements &Train_DS, vector<int> &Train_EV,
 
     initDataset(Train_DS, Train_EV, Valid_DS, Valid_EV, Test_DS, Test_EV);
 
-    cout << "\n> Loading MNIST datasets" << endl;
+    QTextStream(stdout) << "\n> Loading MNIST datasets" << Qt::endl;
 
     string path_to_folder = "/Users/radoslavradev/Sites/bachelor-thesis/"
                             "bachelor-thesis-source-code/MNIST_data/";

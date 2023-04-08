@@ -22,7 +22,8 @@ using namespace std;
 
 //! Fully connected layer class
 /*!
-  The class describes the oprations of a multi layered perceptron
+  The class describes the oprations of a multi layered perceptron.
+  And it will compute the class scores, after the convolutional layer.
 */
 class FullyConnectedLayer {
 public:
