@@ -224,14 +224,18 @@ void Network::_iterate(
             time(&elapsed);
             total = (double)(elapsed - t_start) / sample_indx * dataset_size;
             left = total - (double)(elapsed - t_start);
-            QTextStream(stdout) << "\t  Accuracy: " << loss << " - "
-                << "Loss: " << accuracy << " - "
+
+            QTextStream out(stdout);
+            out << "\t  Accuracy: " << accuracy << " - "
+                << "Loss: " << loss << " - "
                 << "Sample " << sample_indx << " || "
                 << "Label: " << expected_value << " - "
                 << "Prediction: " << (int)res << " || "
                 << "Elapsed time: " << (double)elapsed - t_start << " - "
                 << "Left time: " << left << " - "
-                << "Total time: " << total << "\r";
+                << "Total time: " << total << Qt::endl;
+
+            out.flush();
         }
     }
 }
@@ -285,8 +289,10 @@ void Network::checkConfiguration(int set_size, int epochs) {
     for (int epoch = 0; epoch < epochs; epoch++) {
         check_loss.clear();
         check_acc.clear();
-        QTextStream(stdout) << "\t> Epoch " << (epoch + 1) << " ||";
-        _iterate(check_DS, Check_EV, check_loss, check_acc, (set_size - 2), true);
+        QTextStream out(stdout);
+        out << "\t> Epoch " << (epoch + 1) << "  ||";
+        out.flush();
+        _iterate(check_DS, Check_EV, check_loss, check_acc, (set_size - 1), true);
     }
 
     double loss_avg = 0.0;
