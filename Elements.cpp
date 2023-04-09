@@ -1,5 +1,7 @@
 #include "Elements.h"
 
+#include <QTextStream>
+
 Elements::Elements(int height, int width) {
 
     _data.resize(height * width);
@@ -47,7 +49,7 @@ Elements::Elements(int *params, int length) {
 
 void Elements::init(const int *params, int length) {
     if (_data.size() != 0) {
-        // TODO decide on errors (Data already set)
+        QTextStream(stderr) << "Data already set" << Qt::endl;
     } else {
         _init(params, length);
 
@@ -89,7 +91,7 @@ int Elements::_find(int *indices, int length) const {
 void Elements::assign(double val, int *indices, int length) {
 
     if (length != _params_length) {
-        // TODO decide on errors (Incorrect params length)
+        QTextStream(stderr) << "Incorrect params length" << Qt::endl;
     } else {
         // When _params_length = 4:
         // _data[l + h*l + w*l*h + d*l*h*w]
@@ -108,7 +110,7 @@ double Elements::getValue(int *indices, int params_length) const {
     double res = -1;
 
     if (params_length != _params_length) {
-        // TODO decide on errors (Incorrect params length)
+        QTextStream(stderr) << "Incorrect params length" << Qt::endl;
     } else {
         // When _params_length = 4:
         // _data[l + h*l + w*l*h + d*l*h*w]
@@ -129,7 +131,7 @@ double Elements::getValue(int *indices, int params_length) const {
 
 void Elements::add(double val, int *indices, int length) {
     if (length != _params_length) {
-        // TODO decide on errors (Incorrect params length)
+        QTextStream(stderr) << "Incorrect params length" << Qt::endl;
     } else {
         // When _params_length = 4:
         // _data[l + h*l + w*l*h + d*l*h*w]
@@ -175,7 +177,7 @@ Elements &Elements::operator=(const Elements &elements) {
 
 double &Elements::operator[](int index) {
     if (index >= _length) {
-        // TODO decide on errors (Index out of bound)
+        QTextStream(stderr) << "Index out of bound" << Qt::endl;
         return _data.back();
     }
 

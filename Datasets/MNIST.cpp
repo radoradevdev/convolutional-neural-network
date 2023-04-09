@@ -94,7 +94,7 @@ void MNIST::loadDataset(
 
         QTextStream(stdout) << "\n\tDatasets loaded" << Qt::endl;
     } else {
-        // TODO decide on errors (The dataset could not be found.)
+        QTextStream(stderr) << "The dataset could not be found." << Qt::endl;
     }
 }
 

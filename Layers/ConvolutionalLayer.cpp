@@ -1,5 +1,7 @@
 #include "ConvolutionalLayer.h"
 
+#include <QTextStream>
+
 using namespace std;
 
 ConvolutionalLayer::ConvolutionalLayer(
@@ -13,7 +15,7 @@ ConvolutionalLayer::ConvolutionalLayer(
     srand(time(NULL));
 
     if (image_dim[0] != kernels[3]) {
-        // TODO decide on errors (depth of the filter must match the depth of the image.)
+        QTextStream(stderr) << "The depth of the filter must match the depth of the image." << Qt::endl;
     }
 
     // Set image dim and kernels,
