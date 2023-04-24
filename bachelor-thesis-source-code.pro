@@ -1,4 +1,5 @@
 QT -= gui
+QT += charts
 
 CONFIG += c++20 console
 CONFIG -= app_bundle

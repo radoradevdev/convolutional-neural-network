@@ -1,5 +1,10 @@
 #include "Network.h"
 
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
+
 void Network::addConvolutionalLayer(
         vector<int> &image_dim,
         vector<int> &kernels,
@@ -190,7 +195,7 @@ void Network::_iterate(
         // and the actual target output.
         // The MSE loss function is defined as the average of the squared differences
         // between the predicted values and the actual values
-        double res = 0;
+        double res = 0.0;
         for (int class_indx = 0; class_indx < _num_clss; class_indx++) {
             res += pow(error[class_indx], 2);
         }
@@ -217,6 +222,8 @@ void Network::_iterate(
         // Adjust the weights
         if (b_training) {
             _backward(error);
+        } else {
+//            cout << ""; // breakpoint here to debug
         }
         if (sample_indx % preview_interval == 0 && sample_indx != 0) {
             double left, total;
@@ -226,7 +233,7 @@ void Network::_iterate(
             left = total - (double)(elapsed - t_start);
 
             QTextStream out(stdout);
-            out << "\t  Accuracy: " << accuracy << " - "
+            out << "\r\t  Accuracy: " << accuracy << " - "
                 << "Loss: " << loss << " - "
                 << "Sample " << sample_indx << " || "
                 << "Label: " << expected_value << " - "
@@ -290,7 +297,7 @@ void Network::checkConfiguration(int set_size, int epochs) {
         check_loss.clear();
         check_acc.clear();
         QTextStream out(stdout);
-        out << "\t> Epoch " << (epoch + 1) << "  ||";
+        out << "\t> Epoch " << (epoch + 1) << Qt::endl;
         out.flush();
         _iterate(check_DS, Check_EV, check_loss, check_acc, (set_size - 1), true);
     }
@@ -301,5 +308,75 @@ void Network::checkConfiguration(int set_size, int epochs) {
     }
 
     // The losses should be closed to 0
-   QTextStream(stdout) << "\n\n\tFinal losses: " <<  loss_avg;
+    QTextStream(stdout) << "\n\n\tFinal losses: " <<  loss_avg;
+}
+
+void Network::plotResults() {
+    // Create chart and set title
+    QChart *chart = new QChart();
+    chart->setTitle("Accuracy % /Loss");
+
+    // Create series and add data
+    QLineSeries *trainAccSeries = new QLineSeries();
+    QLineSeries *validAccSeries = new QLineSeries();
+    QLineSeries *trainLossSeries = new QLineSeries();
+    QLineSeries *validLossSeries = new QLineSeries();
+
+    trainAccSeries->setName("Train Accuracy");
+    validAccSeries->setName("Validation Accuracy");
+    trainLossSeries->setName("Train Loss");
+    validLossSeries->setName("Validation Loss");
+
+    int lenTrain = 100; // train_acc.size();
+    int deltaTrain = 1;
+    for (int i = 0; i < lenTrain; i += deltaTrain) {
+        trainAccSeries->append(i, train_acc[i]);
+        trainLossSeries->append(i, train_loss[i]);
+    }
+
+    int lenValid = 100; // valid_acc.size();
+    int deltaValid = 1;
+    for (int i = 0; i < lenValid; i += deltaValid) {
+        if(isnan(valid_loss[i])) {
+            valid_loss[i] = 1; // TODO: remove and figure out why there are nans
+        }
+        validAccSeries->append(i, valid_acc[i]);
+        validLossSeries->append(i, valid_loss[i]);
+    }
+
+    // Add series to chart
+    chart->addSeries(trainAccSeries);
+    chart->addSeries(validAccSeries);
+    chart->addSeries(trainLossSeries);
+    chart->addSeries(validLossSeries);
+
+    // Set axis titles
+    QValueAxis *xAxis = new QValueAxis;
+    xAxis->setTitleText("Iteration %");
+    chart->addAxis(xAxis, Qt::AlignBottom);
+
+    QValueAxis *yAxisA = new QValueAxis;
+    yAxisA->setTitleText("Accuracy %");
+    chart->addAxis(yAxisA, Qt::AlignLeft);
+
+    QValueAxis *yAxisL = new QValueAxis;
+    yAxisL->setTitleText("Loss");
+    chart->addAxis(yAxisL, Qt::AlignRight);
+
+    // Attach series to axes
+    trainAccSeries->attachAxis(xAxis);
+    trainAccSeries->attachAxis(yAxisA);
+    validAccSeries->attachAxis(xAxis);
+    validAccSeries->attachAxis(yAxisA);
+    trainLossSeries->attachAxis(xAxis);
+    trainLossSeries->attachAxis(yAxisL);
+    validLossSeries->attachAxis(xAxis);
+    validLossSeries->attachAxis(yAxisL);
+
+    // Create chart view and add chart to it
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    // Show chart view
+    chartView->show();
 }

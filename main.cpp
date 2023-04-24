@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+#include <QApplication>
 #include <vector>
 
 #include <Network.h>
@@ -13,7 +13,7 @@ vector<int> image_2{8, 13, 13}, conv_kernels_2{2, 3, 3, 8}, hidden{72};
 int input_layer, num_classes, epochs, padding, stride;
 
 int main(int argc, char *argv[]) {
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     // network initialization
     Network network;
@@ -33,13 +33,17 @@ int main(int argc, char *argv[]) {
     network.loadDataset(DatasetType::MNIST);
 
     // sanity check
-    network.checkConfiguration();
+//    network.checkConfiguration();
 
     // train the network
-    network.train(epochs = 5, 10);
+    network.train(epochs = 1, 10);
+
+    network.plotResults();
 
     // test the network, with another set
-    network.test(10);
+//    network.test(10);
+
+//    network.plotResults();
 
     QTextStream(stdout) << "End";
 
