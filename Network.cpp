@@ -65,12 +65,15 @@ void Network::loadDataset(DatasetType dataset) {
         class MNIST mnist;
 
         mnist.getDataset(Train_DS, Train_EV, Valid_DS, Valid_EV, Test_DS, Test_EV);
+    } else if(dataset == DatasetType::CARTEDUCIEL) {
+        class CarteDuCiel cdc;
 
-        _image_shape[2] = Train_DS.getParam(3); // width
-        _image_shape[1] = Train_DS.getParam(2); // height
-        _image_shape[0] = Train_DS.getParam(1); // depth
+        cdc.getDataset(Train_DS, Train_EV, Test_DS, Test_EV);
     }
-    // TODO: add more
+
+    _image_shape[2] = Train_DS.getParam(3); // width
+    _image_shape[1] = Train_DS.getParam(2); // height
+    _image_shape[0] = Train_DS.getParam(1); // depth
 }
 
 void Network::_forward(Elements &image) {
@@ -248,7 +251,7 @@ void Network::_iterate(
 }
 
 
-void Network::train(int epochs, int preview_interval) {
+void Network::train(int epochs, int preview_interval, bool doValidate) {
 
     QTextStream(stdout) <<"\n\n> Traininig: " << Qt::endl;
 
@@ -256,9 +259,11 @@ void Network::train(int epochs, int preview_interval) {
         QTextStream(stdout) << "\n\t> Epoch " << epoch + 1 << Qt::endl;
         _iterate(Train_DS, Train_EV, train_loss, train_acc, preview_interval, true);
 
-        QTextStream(stdout) << ("\nValidating:\n") << Qt::endl;
-        // the model evaluation is performed on the validation set after every epoch
-        _iterate(Valid_DS, Valid_EV, valid_loss, valid_acc, preview_interval, false);
+        if(doValidate) {
+            QTextStream(stdout) << ("\nValidating:\n") << Qt::endl;
+            // the model evaluation is performed on the validation set after every epoch
+            _iterate(Valid_DS, Valid_EV, valid_loss, valid_acc, preview_interval, false);
+        }
     }
 }
 

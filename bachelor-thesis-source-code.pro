@@ -9,6 +9,7 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        Datasets/carteduciel.cpp \
         Elements.cpp \
         Layers/ConvolutionalLayer.cpp \
         Layers/FullyConnectedLayer.cpp \
@@ -26,6 +27,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     ConvolutionalLayer.h \
+    Datasets/carteduciel.h \
     Elements.h \
     FullyConnectedLayer.h \
     Layers/ConvolutionalLayer.h \

@@ -8,6 +8,7 @@
 #include <QTextStream>
 
 #include "Datasets/MNIST.h"
+#include "Datasets/carteduciel.h"
 #include "Layers/ConvolutionalLayer.h"
 #include "Layers/PoolingLayer.h"
 #include "Layers/FullyConnectedLayer.h"
@@ -25,7 +26,8 @@ enum LayerType {
 
 //! Dataset Enum
 enum DatasetType {
-    MNIST,   /*!< Handwritten digits */
+    MNIST,          /*!< Handwritten digits */
+    CARTEDUCIEL,    /*!< Asterisms */
 };
 
 //!  The Main Engine of the program
@@ -98,8 +100,9 @@ public:
     /*!
       \param epochs         how many times to run the training set through the network
       \param preview_interval preview period of the output display
+      \param doValidate     do validate or not
     */
-    void train(int epochs = 1, int preview_interval = 1);
+    void train(int epochs = 1, int preview_interval = 1, bool doValidate = true);
 
     //! Tests the network, with test data, against the weights gained from training.
     /*!
