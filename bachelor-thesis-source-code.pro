@@ -1,5 +1,5 @@
 QT -= gui
-QT += charts
+QT += charts printsupport widgets
 
 CONFIG += c++20 console
 CONFIG -= app_bundle
@@ -11,6 +11,7 @@ CONFIG -= app_bundle
 SOURCES += \
         Datasets/carteduciel.cpp \
         Elements.cpp \
+        External/qcustomplot.cpp \
         Layers/ConvolutionalLayer.cpp \
         Layers/FullyConnectedLayer.cpp \
         Datasets/MNIST.cpp \
@@ -29,6 +30,7 @@ HEADERS += \
     ConvolutionalLayer.h \
     Datasets/carteduciel.h \
     Elements.h \
+    External/qcustomplot.h \
     FullyConnectedLayer.h \
     Layers/ConvolutionalLayer.h \
     Layers/FullyConnectedLayer.h \
