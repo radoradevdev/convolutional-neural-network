@@ -7,7 +7,8 @@
 void CarteDuCiel::loadDataset(
         string path,
         Elements &set,
-        vector<int> &values
+        vector<int> &values,
+        int length
         ) {
     try {
         // Create a QDir object to access the folder
@@ -29,9 +30,9 @@ void CarteDuCiel::loadDataset(
         int indx_img = 0;
         // Iterate through the image files and map them to QImage objects
         foreach (const QFileInfo &fileInfo, fileList) {
-//            if(indx_img == 1500) {
-//                break;
-//            }
+            if(indx_img == length) {
+                break;
+            }
             QString filePath = fileInfo.absoluteFilePath();
             QImage image;
             if (!image.load(filePath)) {
@@ -91,9 +92,9 @@ void CarteDuCiel::getDataset(Elements &Train_DS, vector<int> &Train_EV,
     string path_to_folder = "/Users/radoslavradev/Sites/bachelor-thesis/"
                             "bachelor-thesis-source-code/CarteDuCiel_data/";
 
-    loadDataset(path_to_folder + "/ROBO33_000008_train", Train_DS, Train_EV);
+    loadDataset(path_to_folder + "/ROBO33_000008_train", Train_DS, Train_EV, CARTEDUCIEL_TRAIN_LEN);
 
-    loadDataset(path_to_folder + "/ROBO33_000008_test", Test_DS, Test_EV);
+    loadDataset(path_to_folder + "/ROBO33_000008_test", Test_DS, Test_EV, CARTEDUCIEL_TEST_LEN);
 
     normalizeSet(Train_DS, CARTEDUCIEL_TRAIN_LEN, IMAGE_SIDE, IMAGE_SIDE);
     normalizeSet(Test_DS, CARTEDUCIEL_TEST_LEN, IMAGE_SIDE, IMAGE_SIDE);

@@ -37,3 +37,20 @@ double Util::frand() {
     // to be generated more frequently than others.
     return (double)(arc4random() % 100) / 1000;
 }
+
+QImage Util::elementsToQImage(const Elements &image) {
+    int height = image.getParam(1);
+    int width = image.getParam(2);
+
+    QImage out(height, width, QImage::Format_Grayscale16);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int in_cache[3] = { 0, y, x };
+            double val = image.getValue(in_cache, 3);
+            QPoint point(y, x);
+            out.setPixel(point, val);
+        }
+    }
+
+    return out;
+}

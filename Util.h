@@ -7,6 +7,8 @@
 
 #include "Elements.h"
 
+#include <QImage>
+
 //! Utility class
 /*!
   The class contains static helper functions
@@ -38,6 +40,9 @@ public:
 
     //! Generates a random float number
     static double frand();
+
+    //! Converts Elements to QImage WIP
+    static QImage elementsToQImage(const Elements &image);
 };
 
 #endif // UTIL_H

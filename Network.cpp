@@ -5,6 +5,10 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 
+#include <QLabel>
+
+#include <External/qcustomplot.h>
+
 void Network::addConvolutionalLayer(
         vector<int> &image_dim,
         vector<int> &kernels,
@@ -76,11 +80,14 @@ void Network::loadDataset(DatasetType dataset) {
     _image_shape[0] = Train_DS.getParam(1); // depth
 }
 
-void Network::_forward(Elements &image) {
+void Network::_forward(Elements &image, bool b_plot) {
     Elements img_out; /**< The modified image */
 
     // Go through all layers
     for (int layer_indx = 0; layer_indx < _total_lrs; layer_indx++) {
+        if(b_plot) {
+            plotList.append(Util::elementsToQImage(image));
+        }
         if (_layers[layer_indx] == LayerType::Conv) {
             // Forward convolution
             _convs[_conv_indx].fwd(image, img_out);
@@ -162,7 +169,8 @@ void Network::_iterate(
         vector<double> &losses,
         vector<double> &accuracies,
         int preview_interval,
-        bool b_training
+        bool b_training,
+        bool b_plot
         ) {
 
     int expected_value = 0;
@@ -183,7 +191,7 @@ void Network::_iterate(
 
         // the result of the forward propagation is stored in _results
         _conv_indx = 0;
-        _forward(image);
+        _forward(image, b_plot);
 
         // Error evaluation:
         vector<double> y(_num_clss, 0), error(_num_clss, 0);
@@ -247,6 +255,8 @@ void Network::_iterate(
 
             out.flush();
         }
+
+        b_plot = false;
     }
 }
 
@@ -257,7 +267,7 @@ void Network::train(int epochs, int preview_interval, bool doValidate) {
 
     for (int epoch = 0; epoch < epochs; epoch++) {
         QTextStream(stdout) << "\n\t> Epoch " << epoch + 1 << Qt::endl;
-        _iterate(Train_DS, Train_EV, train_loss, train_acc, preview_interval, true);
+        _iterate(Train_DS, Train_EV, train_loss, train_acc, preview_interval, true, true);
 
         if(doValidate) {
             QTextStream(stdout) << ("\nValidating:\n") << Qt::endl;
@@ -323,23 +333,23 @@ void Network::plotResults() {
 
     // Create series and add data
     QLineSeries *trainAccSeries = new QLineSeries();
-    QLineSeries *validAccSeries = new QLineSeries();
+//    QLineSeries *validAccSeries = new QLineSeries();
     QLineSeries *trainLossSeries = new QLineSeries();
-    QLineSeries *validLossSeries = new QLineSeries();
+//    QLineSeries *validLossSeries = new QLineSeries();
 
     trainAccSeries->setName("Train Accuracy");
-    validAccSeries->setName("Validation Accuracy");
+//    validAccSeries->setName("Validation Accuracy");
     trainLossSeries->setName("Train Loss");
-    validLossSeries->setName("Validation Loss");
+//    validLossSeries->setName("Validation Loss");
 
-    int lenTrain = 100; // train_acc.size();
+    int lenTrain = train_acc.size();
     int deltaTrain = 1;
     for (int i = 0; i < lenTrain; i += deltaTrain) {
         trainAccSeries->append(i, train_acc[i]);
         trainLossSeries->append(i, train_loss[i]);
     }
 
-    int lenValid = 100; // valid_acc.size();
+    /*int lenValid = 100; // valid_acc.size();
     int deltaValid = 1;
     for (int i = 0; i < lenValid; i += deltaValid) {
         if(isnan(valid_loss[i])) {
@@ -347,17 +357,17 @@ void Network::plotResults() {
         }
         validAccSeries->append(i, valid_acc[i]);
         validLossSeries->append(i, valid_loss[i]);
-    }
+    }*/
 
     // Add series to chart
     chart->addSeries(trainAccSeries);
-    chart->addSeries(validAccSeries);
+//    chart->addSeries(validAccSeries);
     chart->addSeries(trainLossSeries);
-    chart->addSeries(validLossSeries);
+//    chart->addSeries(validLossSeries);
 
     // Set axis titles
     QValueAxis *xAxis = new QValueAxis;
-    xAxis->setTitleText("Iteration %");
+    xAxis->setTitleText("Iterations");
     chart->addAxis(xAxis, Qt::AlignBottom);
 
     QValueAxis *yAxisA = new QValueAxis;
@@ -371,12 +381,12 @@ void Network::plotResults() {
     // Attach series to axes
     trainAccSeries->attachAxis(xAxis);
     trainAccSeries->attachAxis(yAxisA);
-    validAccSeries->attachAxis(xAxis);
-    validAccSeries->attachAxis(yAxisA);
+//    validAccSeries->attachAxis(xAxis);
+//    validAccSeries->attachAxis(yAxisA);
     trainLossSeries->attachAxis(xAxis);
     trainLossSeries->attachAxis(yAxisL);
-    validLossSeries->attachAxis(xAxis);
-    validLossSeries->attachAxis(yAxisL);
+//    validLossSeries->attachAxis(xAxis);
+//    validLossSeries->attachAxis(yAxisL);
 
     // Create chart view and add chart to it
     QChartView *chartView = new QChartView(chart);
@@ -385,3 +395,65 @@ void Network::plotResults() {
     // Show chart view
     chartView->show();
 }
+
+void Network::plotFilteredImages() {
+    int rows = std::ceil(std::sqrt(plotList.size()));
+    int cols = rows;
+
+    // create a layout for the labels
+    QGridLayout* layout = new QGridLayout();
+
+    // add the first image to the top-left cell
+    QLabel* inputLabel = new QLabel();
+    inputLabel->setPixmap(QPixmap::fromImage(plotList[0]));
+    inputLabel->setAlignment(Qt::AlignCenter);
+    inputLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    layout->addWidget(inputLabel, 0, 0);
+
+    // add the rest of the images
+    for (int i = 1; i < plotList.size(); i++) {
+        QLabel* label = new QLabel();
+        label->setPixmap(QPixmap::fromImage(plotList[i]));
+        label->setAlignment(Qt::AlignCenter);
+        label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+        layout->addWidget(label, i / cols, i % cols);
+    }
+
+    // create the preview widget
+    QWidget* previewWidget = new QWidget();
+    previewWidget->setLayout(layout);
+    previewWidget->setWindowTitle("Preview");
+    previewWidget->show();
+}
+
+/*
+void Network::plotFilteredImages() {
+    QLabel* label = new QLabel();
+    int totalWidth = 0;
+    int maxHeight = 0;
+
+    // Get the total width and maximum height of the images
+    for (const QImage& img : plotList) {
+        totalWidth += img.width();
+        maxHeight = qMax(maxHeight, img.height());
+    }
+
+    // Create a new image to hold all the images
+    QImage combined(totalWidth, maxHeight, QImage::Format_RGB888);
+    combined.fill(Qt::white);
+
+    // Paste each image into the combined image
+    int x = 0;
+    for (const QImage& img : plotList) {
+        QPainter painter(&combined);
+        painter.drawImage(x, 0, img);
+        painter.end();
+        x += img.width();
+    }
+
+    // Set the combined image as the pixmap of the label
+    label->setPixmap(QPixmap::fromImage(combined));
+
+    label->show();
+}
+*/

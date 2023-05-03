@@ -1,8 +1,8 @@
 #ifndef CARTEDUCIEL_H
 #define CARTEDUCIEL_H
 
-#define CARTEDUCIEL_TRAIN_LEN 14400
-#define CARTEDUCIEL_TEST_LEN 4801
+#define CARTEDUCIEL_TRAIN_LEN 9600
+#define CARTEDUCIEL_TEST_LEN 4800
 #define IMAGE_SIDE 28
 
 #include <fstream>
@@ -36,11 +36,10 @@ private:
       \param set        dataset
       \param values     expected values
     */
-    void loadDataset(
-            string path,
+    void loadDataset(string path,
             Elements &set,
-            vector<int> &values
-            );
+            vector<int> &values,
+            int length);
 
     //! Initialze the dataset with its properties
     /*!

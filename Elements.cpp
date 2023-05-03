@@ -147,7 +147,7 @@ void Elements::add(double val, int *indices, int length) {
     }
 }
 
-int Elements::getParam(int index) {
+int Elements::getParam(int index) const {
     return _params[index];
 }
 

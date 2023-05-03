@@ -121,8 +121,11 @@ public:
     */
     void checkConfiguration(int set_size = 50, int epochs = 200);
 
-    //! TODO Plot the results
+    //! Plots accuracy and loss
     void plotResults();
+
+    //! Plots the plotList
+    void plotFilteredImages();
 
 private:
     vector<LayerType> _layers; /*!< All layers in the CNN */
@@ -162,11 +165,15 @@ private:
                    valid_loss, /*!< Training losses */
                    test_loss;  /*!< Training losses */
 
+    //! Keep the plot images
+    //! 28x28 -> 14x14 -> 6x6
+    QList<QImage> plotList;
+
     //! Performs forward propagation
     /*!
       \param image current image
     */
-    void _forward(Elements &image);
+    void _forward(Elements &image, bool b_plot = false);
 
     //! Performs backwards propagation
     /*!
@@ -182,15 +189,15 @@ private:
       \param acc_list           accuracy
       \param preview_interval   preview period of the output display
       \param b_training         to update the weights or not?
+      \param b_plot             to plot preview or not?
     */
-    void _iterate(
-            Elements &dataset,
+    void _iterate(Elements &dataset,
             vector<int> &expected_values,
             vector<double> &loss_list,
             vector<double> &acc_list,
             int preview_interval,
-            bool b_training = true
-            );
+            bool b_training = true,
+            bool b_plot = false);
 
     //! Gets specific image from the dataset by index
     /*!
