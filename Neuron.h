@@ -1,5 +1,5 @@
-#ifndef PERCEPTRON_H
-#define PERCEPTRON_H
+#ifndef NEURON_H
+#define NEURON_H
 
 #include <numeric> // because of inner_product
 #include <vector>
@@ -12,14 +12,14 @@ using namespace std;
 /*!
   The class describes the oprations of a single perceptron in a layer
 */
-class Perceptron {
+class Neuron {
 public:
     //! Constructor for initializing the Perceptron
     /*!
       \param inputs  count of inputs
       \param bias    constant to offset the weights
     */
-    Perceptron(int inputs, double bias = 1.0);
+    Neuron(int inputs, double bias = 1.0);
 
     //! Constructor for initializing the Perceptron
     /*!
@@ -49,4 +49,4 @@ private:
     double _bias;                       /*!< constant to offset the weights */
 };
 
-#endif // PERCEPTRON_H
+#endif // NEURON_H

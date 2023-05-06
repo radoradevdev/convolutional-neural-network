@@ -1,6 +1,6 @@
-#include "Perceptron.h"
+#include "Neuron.h"
 
-Perceptron::Perceptron(int inputs, double bias) {
+Neuron::Neuron(int inputs, double bias) {
 
     _bias = bias;
     _weights.resize(inputs + 1); // vector with inputs + 1 elements
@@ -11,7 +11,7 @@ Perceptron::Perceptron(int inputs, double bias) {
     generate(_weights.begin(), _weights.end(), Util::frand);
 }
 
-double Perceptron::run(vector<double> x) {
+double Neuron::run(vector<double> x) {
     x.push_back(_bias);
 
     // Returns the result of accumulating 0.0 with the inner products of the pairs
@@ -20,10 +20,10 @@ double Perceptron::run(vector<double> x) {
     return sigmoid(sum);
 }
 
-void Perceptron::setWeights(vector<double> init_weights) {
+void Neuron::setWeights(vector<double> init_weights) {
     _weights = init_weights;
 }
 
-double Perceptron::sigmoid(double x) {
+double Neuron::sigmoid(double x) {
     return 1.0 / (1.0 + exp(-x));
 }

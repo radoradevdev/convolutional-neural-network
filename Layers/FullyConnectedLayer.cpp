@@ -19,11 +19,11 @@ FullyConnectedLayer::FullyConnectedLayer(
         _values.push_back(vector<double>(layers[layer_indx], 0.0));
         _d.push_back(vector<double>(layers[layer_indx], 0.0));
         _loss_gradient.push_back(vector<double>(layers[layer_indx], 0.0));
-        _network.push_back(vector<Perceptron>());
+        _network.push_back(vector<Neuron>());
 
         if (layer_indx > 0) { // network[0] is the input layer, so it doesn't have neurons
             for (int indx = 0; indx < layers[layer_indx]; indx++) {
-                _network[layer_indx].push_back(Perceptron(layers[layer_indx - 1], bias));
+                _network[layer_indx].push_back(Neuron(layers[layer_indx - 1], bias));
             }
         }
     }

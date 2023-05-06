@@ -16,8 +16,8 @@ SOURCES += \
         Layers/FullyConnectedLayer.cpp \
         Datasets/MNIST.cpp \
         Network.cpp \
-        Perceptron.cpp \
         Layers/PoolingLayer.cpp \
+        Neuron.cpp \
         Util.cpp \
         main.cpp
 
@@ -37,6 +37,6 @@ HEADERS += \
     Layers/PoolingLayer.h \
     Datasets/MNIST.h \
     Network.h \
-    Perceptron.h \
+    Neuron.h \
     PoolingLayer.h \
     Util.h
