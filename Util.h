@@ -41,8 +41,14 @@ public:
     //! Generates a random float number
     static double frand();
 
-    //! Converts Elements to QImage WIP
+    //! Converts Elements to QImage
     static QImage elementsToQImage(const Elements &image);
+
+    //! Prints QImage
+    static void printQImage(const QImage &image);
+
+    //! Converts Grayscale image to heatmap
+    static QImage grayscaleToHeatmap(const QImage &grayscaleImage);
 };
 
 #endif // UTIL_H
