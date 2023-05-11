@@ -401,59 +401,33 @@ void Network::plotFilteredImages() {
     int cols = rows;
 
     // create a layout for the labels
-    QGridLayout* layout = new QGridLayout();
+//    QGridLayout* layout = new QGridLayout();
+
+//    QImage heatmapImage = plotList[0];
+    QImage heatmapImage =  Util::grayscaleToHeatmap(plotList[0]);
+    QImage resizedImage = heatmapImage.scaled(200, 200);
+
 
     // add the first image to the top-left cell
     QLabel* inputLabel = new QLabel();
-    inputLabel->setPixmap(QPixmap::fromImage(plotList[0]));
-    inputLabel->setAlignment(Qt::AlignCenter);
-    inputLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    layout->addWidget(inputLabel, 0, 0);
+    inputLabel->setPixmap(QPixmap::fromImage(resizedImage));
+    inputLabel->show();
+//    inputLabel->setAlignment(Qt::AlignCenter);
+//    inputLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+//    layout->addWidget(inputLabel, 0, 0);
 
     // add the rest of the images
-    for (int i = 1; i < plotList.size(); i++) {
-        QLabel* label = new QLabel();
-        label->setPixmap(QPixmap::fromImage(plotList[i]));
-        label->setAlignment(Qt::AlignCenter);
-        label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-        layout->addWidget(label, i / cols, i % cols);
-    }
+//    for (int i = 1; i < plotList.size(); i++) {
+//        QLabel* label = new QLabel();
+//        label->setPixmap(QPixmap::fromImage(plotList[i]));
+//        label->setAlignment(Qt::AlignCenter);
+//        label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+//        layout->addWidget(label, i / cols, i % cols);
+//    }
 
     // create the preview widget
-    QWidget* previewWidget = new QWidget();
-    previewWidget->setLayout(layout);
-    previewWidget->setWindowTitle("Preview");
-    previewWidget->show();
+//    QWidget* previewWidget = new QWidget();
+//    previewWidget->setLayout(layout);
+//    previewWidget->setWindowTitle("Preview");
+//    previewWidget->show();
 }
-
-/*
-void Network::plotFilteredImages() {
-    QLabel* label = new QLabel();
-    int totalWidth = 0;
-    int maxHeight = 0;
-
-    // Get the total width and maximum height of the images
-    for (const QImage& img : plotList) {
-        totalWidth += img.width();
-        maxHeight = qMax(maxHeight, img.height());
-    }
-
-    // Create a new image to hold all the images
-    QImage combined(totalWidth, maxHeight, QImage::Format_RGB888);
-    combined.fill(Qt::white);
-
-    // Paste each image into the combined image
-    int x = 0;
-    for (const QImage& img : plotList) {
-        QPainter painter(&combined);
-        painter.drawImage(x, 0, img);
-        painter.end();
-        x += img.width();
-    }
-
-    // Set the combined image as the pixmap of the label
-    label->setPixmap(QPixmap::fromImage(combined));
-
-    label->show();
-}
-*/
