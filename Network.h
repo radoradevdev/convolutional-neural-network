@@ -122,7 +122,7 @@ public:
     void checkConfiguration(int set_size = 50, int epochs = 200);
 
     //! Plots accuracy and loss
-    void plotResults();
+    void plotResults(bool doValidate = true);
 
     //! Plots the plotList
     void plotFilteredImages();

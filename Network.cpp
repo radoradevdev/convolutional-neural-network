@@ -326,21 +326,23 @@ void Network::checkConfiguration(int set_size, int epochs) {
     QTextStream(stdout) << "\n\n\tFinal losses: " <<  loss_avg;
 }
 
-void Network::plotResults() {
+void Network::plotResults(bool doValidate) {
     // Create chart and set title
     QChart *chart = new QChart();
     chart->setTitle("Accuracy % /Loss");
 
     // Create series and add data
     QLineSeries *trainAccSeries = new QLineSeries();
-//    QLineSeries *validAccSeries = new QLineSeries();
     QLineSeries *trainLossSeries = new QLineSeries();
-//    QLineSeries *validLossSeries = new QLineSeries();
+    QLineSeries *validAccSeries = new QLineSeries();
+    QLineSeries *validLossSeries = new QLineSeries();
 
     trainAccSeries->setName("Train Accuracy");
-//    validAccSeries->setName("Validation Accuracy");
     trainLossSeries->setName("Train Loss");
-//    validLossSeries->setName("Validation Loss");
+    if(doValidate) {
+        validAccSeries->setName("Validation Accuracy");
+        validLossSeries->setName("Validation Loss");
+    }
 
     int lenTrain = train_acc.size();
     int deltaTrain = 1;
@@ -349,21 +351,25 @@ void Network::plotResults() {
         trainLossSeries->append(i, train_loss[i]);
     }
 
-    /*int lenValid = 100; // valid_acc.size();
-    int deltaValid = 1;
-    for (int i = 0; i < lenValid; i += deltaValid) {
-        if(isnan(valid_loss[i])) {
-            valid_loss[i] = 1; // TODO: remove and figure out why there are nans
+    if(doValidate) {
+        int lenValid = 100; // valid_acc.size();
+        int deltaValid = 1;
+        for (int i = 0; i < lenValid; i += deltaValid) {
+            if(isnan(valid_loss[i])) {
+                valid_loss[i] = 1; // TODO: remove and figure out why there are nans
+            }
+            validAccSeries->append(i, valid_acc[i]);
+            validLossSeries->append(i, valid_loss[i]);
         }
-        validAccSeries->append(i, valid_acc[i]);
-        validLossSeries->append(i, valid_loss[i]);
-    }*/
+    }
 
     // Add series to chart
     chart->addSeries(trainAccSeries);
-//    chart->addSeries(validAccSeries);
     chart->addSeries(trainLossSeries);
-//    chart->addSeries(validLossSeries);
+    if(doValidate) {
+        chart->addSeries(validAccSeries);
+        chart->addSeries(validLossSeries);
+    }
 
     // Set axis titles
     QValueAxis *xAxis = new QValueAxis;
@@ -381,12 +387,14 @@ void Network::plotResults() {
     // Attach series to axes
     trainAccSeries->attachAxis(xAxis);
     trainAccSeries->attachAxis(yAxisA);
-//    validAccSeries->attachAxis(xAxis);
-//    validAccSeries->attachAxis(yAxisA);
     trainLossSeries->attachAxis(xAxis);
     trainLossSeries->attachAxis(yAxisL);
-//    validLossSeries->attachAxis(xAxis);
-//    validLossSeries->attachAxis(yAxisL);
+    if(doValidate) {
+        validAccSeries->attachAxis(xAxis);
+        validAccSeries->attachAxis(yAxisA);
+        validLossSeries->attachAxis(xAxis);
+        validLossSeries->attachAxis(yAxisL);
+    }
 
     // Create chart view and add chart to it
     QChartView *chartView = new QChartView(chart);
