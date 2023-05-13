@@ -26,16 +26,16 @@ int main(int argc, char *argv[]) {
                                   bias = 0.1, roc = 0.01);
 
     network.addFullyConnectedLayer(input_layer = 2 * 6 * 6, hidden,
-                                   num_classes = 4, bias = 1.0, adam = false,
+                                   num_classes = 10, bias = 1.0, adam = false,
                                    roc = 0.5);
 
     // load the dataset
-    network.loadDataset(DatasetType::CARTEDUCIEL);
+    network.loadDataset(DatasetType::MNIST);
 
     // train the network
-    network.train(epochs = 1, 100, false);
+    network.train(epochs = 4, 100, false);
 
-    network.plotResults();
+    network.plotResults(false);
 
     // test the network, with another set
     // network.test(100);

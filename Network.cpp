@@ -267,7 +267,7 @@ void Network::train(int epochs, int preview_interval, bool doValidate) {
 
     for (int epoch = 0; epoch < epochs; epoch++) {
         QTextStream(stdout) << "\n\t> Epoch " << epoch + 1 << Qt::endl;
-        _iterate(Train_DS, Train_EV, train_loss, train_acc, preview_interval, true, true);
+        _iterate(Train_DS, Train_EV, train_loss, train_acc, preview_interval, true, false);
 
         if(doValidate) {
             QTextStream(stdout) << ("\nValidating:\n") << Qt::endl;
