@@ -201,6 +201,9 @@ void ConvolutionalLayer::bp(Elements out, Elements &image) {
 
                             double val_d_filt = _cache.getValue(in_cache, 3) *
                                     out.getValue(in_vol, 3);
+                            if(std::isnan(val_d_filt)) {
+                                QTextStream(stdout) << ("\nNan:\n") << Qt::endl;
+                            }
                             double val_d_in =
                                     out.getValue(in_vol, 3) * _filter.getValue(filt, 4);
 

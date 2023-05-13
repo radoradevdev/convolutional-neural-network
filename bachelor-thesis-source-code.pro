@@ -1,5 +1,5 @@
 QT -= gui
-QT += charts
+QT += charts printsupport widgets
 
 CONFIG += c++20 console
 CONFIG -= app_bundle
@@ -9,13 +9,15 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        Datasets/carteduciel.cpp \
         Elements.cpp \
+        External/qcustomplot.cpp \
         Layers/ConvolutionalLayer.cpp \
         Layers/FullyConnectedLayer.cpp \
         Datasets/MNIST.cpp \
         Network.cpp \
-        Perceptron.cpp \
         Layers/PoolingLayer.cpp \
+        Neuron.cpp \
         Util.cpp \
         main.cpp
 
@@ -26,13 +28,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     ConvolutionalLayer.h \
+    Datasets/carteduciel.h \
     Elements.h \
+    External/qcustomplot.h \
     FullyConnectedLayer.h \
     Layers/ConvolutionalLayer.h \
     Layers/FullyConnectedLayer.h \
     Layers/PoolingLayer.h \
     Datasets/MNIST.h \
     Network.h \
-    Perceptron.h \
+    Neuron.h \
     PoolingLayer.h \
     Util.h

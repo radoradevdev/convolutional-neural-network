@@ -64,7 +64,7 @@ public:
     /*!
       \param index index of the parameter(0=layers, 1=height, 2=width, 3=depth)
     */
-    int getParam(int index);
+    int getParam(int index) const;
 
     //! Get length, the product of all parameters
     int getLength();

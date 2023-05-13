@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "Util.h"
-#include "Perceptron.h"
+#include "Neuron.h"
 
 //! Hyperparameters for the Adam function
 #define BETA1 0.9
@@ -85,7 +85,7 @@ private:
     int _back_iter; /*!< backpropagation iterations */
     bool _b_adam;   /*!< apply adam or not? */
 
-    vector<vector<Perceptron>> _network;    /*!< network of perceptrons */
+    vector<vector<Neuron>> _network;    /*!< network of perceptrons */
     vector<vector<double>> _values;         /*!< values obtained in forward prop */
     vector<vector<double>> _d;              /*!< values obtained in backward prop */
     vector<vector<double>> _loss_gradient;  /*!< errors */
