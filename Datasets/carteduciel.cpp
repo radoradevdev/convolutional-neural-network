@@ -90,7 +90,7 @@ void CarteDuCiel::getDataset(Elements &Train_DS, vector<int> &Train_EV,
     QTextStream(stdout) << "\n> Loading CarteDuCiel datasets" << Qt::endl;
 
     string path_to_folder = "/Users/radoslavradev/Sites/bachelor-thesis/"
-                            "bachelor-thesis-source-code/CarteDuCiel_data/";
+                            "bachelor-thesis-source-code/CDCA1_data/";
 
     loadDataset(path_to_folder + "/ROBO33_000008_train", Train_DS, Train_EV, CARTEDUCIEL_TRAIN_LEN);
 
