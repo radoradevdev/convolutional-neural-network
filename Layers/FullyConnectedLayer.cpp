@@ -1,5 +1,7 @@
 #include "FullyConnectedLayer.h"
 
+#include <QTextStream>
+
 FullyConnectedLayer::FullyConnectedLayer(
         vector<int> layers,
         double bias,
@@ -38,20 +40,19 @@ void FullyConnectedLayer::setWeights(vector<vector<vector<double>>> weights) {
 }
 
 void FullyConnectedLayer::printWeights() {
-    cout << endl;
+    QTextStream(stdout) << "" << Qt::endl;
     for (int indx = 1; indx < (int)_network.size(); indx++) {
         for (int layer_indx = 0; layer_indx < _sublayers[indx]; layer_indx++) {
-            cout << "Layer " << indx + 1 << " Neuron " << layer_indx << ": ";
+            QTextStream(stdout) << "Layer " << indx + 1 << " Neuron " << layer_indx << ": ";
             for (auto &it : _network[indx][layer_indx]._weights)
-                cout << it << "   ";
-            cout << endl;
+                QTextStream(stdout) << it << "   ";
+            QTextStream(stdout) << "" << Qt::endl;
         }
     }
-    cout << endl;
+    QTextStream(stdout) << "" << Qt::endl;
 }
 
 vector<double> FullyConnectedLayer::fwd(vector<double> data) {
-
     _values[0] = data;
     for (int indx = 1; indx < (int)_network.size(); indx++) {
         for (int layer_indx = 0; layer_indx < _sublayers[indx]; layer_indx++) {
@@ -70,10 +71,10 @@ double FullyConnectedLayer::calcAdam(
     int t = _back_iter;
     double dx = derivative;
 
-    past_gradient = BETA1 * past_gradient + (1 - BETA1) * dx;
-    double mt = past_gradient / (1 - (double)pow(BETA1, t));
-    squared_gradient = BETA2 * squared_gradient + (1 - BETA2) * ((double)pow(dx, 2));
-    double vt = squared_gradient / (1 - (double)pow(BETA2, t));
+    past_gradient = FIRST_MOMENT_DECAY * past_gradient + (1 - FIRST_MOMENT_DECAY) * dx;
+    double mt = past_gradient / (1 - (double)pow(FIRST_MOMENT_DECAY, t));
+    squared_gradient = SECOND_MOMENT_DECAY * squared_gradient + (1 - SECOND_MOMENT_DECAY) * ((double)pow(dx, 2));
+    double vt = squared_gradient / (1 - (double)pow(SECOND_MOMENT_DECAY, t));
     double delta = _eta * mt / (sqrt(vt) + EPS);
 
     return delta;

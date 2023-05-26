@@ -27,12 +27,12 @@ int main(int argc, char *argv[]) {
     network.addConvolutionalLayer(conv_1, conv_kernels_1, padding = 1, stride = 1,
                                   bias = 0.1, roc = 0.01);
 
-    network.addPoolingLayer(pool_1, "avg", 2, 2);
+    network.addPoolingLayer(pool_1, PoolingOperation::AVG, 2, 2);
 
     network.addConvolutionalLayer(conv_2, conv_kernels_2, padding = 1, stride = 1,
                                   bias = 0.1, roc = 0.01);
 
-    network.addPoolingLayer(pool_2, "avg", 2, 2);
+    network.addPoolingLayer(pool_2, PoolingOperation::AVG, 2, 2);
 
     network.addFullyConnectedLayer(input_layer = 2 * 8 * 8, hidden,
                                    num_classes = 4, bias = 1.0, adam = false,

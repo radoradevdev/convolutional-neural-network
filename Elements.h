@@ -85,7 +85,7 @@ public:
       \param indices    index on which to assign
       \param length     length of the parameters
     */
-    void assign(double val, int *indices, int length);
+    void allocate(double val, int *indices, int length);
 
     //! Add a value to a specific position in the data vector, Sum
     /*!
@@ -93,7 +93,7 @@ public:
       \param indices    index on which to assign
       \param length     length of the parameters
     */
-    void add(double val, int *indices, int length);
+    void aggregate(double val, int *indices, int length);
 
     //! Overloaded assignment operator
     /*!

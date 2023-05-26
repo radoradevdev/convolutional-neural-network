@@ -1,6 +1,7 @@
 #ifndef MNIST_H
 #define MNIST_H
 
+// Here the parameters of the dataset must be set
 #define MNIST_TRAIN_LEN 50000
 #define MNIST_VALID_LEN 10000
 #define MNIST_TEST_LEN 10000
@@ -83,7 +84,8 @@ private:
             Elements &Valid_DS,
             vector<int> &Valid_EV,
             Elements &Test_DS,
-            vector<int> &Test_EV);
+            vector<int> &Test_EV
+            );
 
     //! Normaliza a set
     /*!

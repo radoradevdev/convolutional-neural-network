@@ -3,6 +3,11 @@
 
 #include "Elements.h"
 
+enum PoolingOperation {
+    MAX,    /*!< Max-pooling */
+    AVG     /*!< Avg-pooling */
+};
+
 //! PoolingLayer class
 /*!
   The class describes the operations of the pooling layers.
@@ -15,11 +20,10 @@ public:
      * \param mode          method of pooling
      * \param size          size of pooling
      * \param stride        stride of pooling
-     * \param padding       padding of pooling
      */
     PoolingLayer(
             int image_dim[3],
-            string mode = "avg",
+            PoolingOperation mode = PoolingOperation::AVG,
             int size = 2,
             int stride = 2
             );
@@ -40,16 +44,13 @@ public:
 private:
     int _image_dim[3] = {1, 16, 16};    /*!< Default image specification */
 
-    int _size = 2;      /*!< TODO */
+    int _size = 2;      /*!< width and height of the pooling window */
     int _stride = 2;    /*!< How many pixels every convolution to shift */
-    string _mode = "avg";   /*!< Mode of pooling */
+    PoolingOperation _mode = PoolingOperation::AVG;   /*!< Mode of pooling */
 
     Elements _cache;    /*!< the cached forward elements */
 
     int _out_dim[3] = {2, 13, 13};      /*!< depth, height, width */
-
-    //! Adjusts the output dimensions
-    void _adjustOutDimensions();
 };
 
 #endif // POOLINGLAYER_H

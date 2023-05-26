@@ -4,7 +4,7 @@
 
 PoolingLayer::PoolingLayer(
         int image_dim[3],
-        string mode,
+        PoolingOperation mode,
         int size,
         int stride
         ) {
@@ -38,6 +38,7 @@ void PoolingLayer::fwd(const Elements& image, Elements &out) {
 
     out.reinit(_out_dim, 3);
 
+    // Apply the pooling operation to make the matrix smaller
     for (int layer = 0; layer < layers; layer++) {
         int y_out = 0, x_out = 0;
 
@@ -46,24 +47,24 @@ void PoolingLayer::fwd(const Elements& image, Elements &out) {
 
             for(int x = 0; x < w_in - _size; x+=_stride) {
                 int arr_out[3] = {layer, y_out, x_out};
-                if(_mode == "avg") {
+                if(_mode == PoolingOperation::AVG) {
                     double sum = 0.0;
-                    for (int f_y_it = 0; f_y_it < _size; f_y_it++) {
-                        for (int f_x_it = 0; f_x_it < _size; f_x_it++) {
+                    for (int f_y = 0; f_y < _size; f_y++) {
+                        for (int f_x = 0; f_x < _size; f_x++) {
                             int in_cache[3] = {layer, y + _size, x + _size};
                             sum += _cache.getValue(in_cache, 3);
                         }
                     }
-                    out.add(sum/(_size * _size), arr_out, 3);
-                } else if(_mode == "max") {
+                    out.aggregate(sum/(_size * _size), arr_out, 3);
+                } else if(_mode == PoolingOperation::MAX) {
                     double max = 0.0;
-                    for (int f_y_it = 0; f_y_it < _size; f_y_it++) {
-                        for (int f_x_it = 0; f_x_it < _size; f_x_it++) {
+                    for (int f_y = 0; f_y < _size; f_y++) {
+                        for (int f_x = 0; f_x < _size; f_x++) {
                             int in_cache[3] = {layer, y + _size, x + _size};
                             max = _cache.getValue(in_cache, 3) > max ?_cache.getValue(in_cache, 3) : max;
                         }
                     }
-                    out.add(max, arr_out, 3);
+                    out.aggregate(max, arr_out, 3);
                 }
                 x_out++;
             }
@@ -93,22 +94,22 @@ void PoolingLayer::bp(Elements out, Elements &image) {
             x_out = 0;
 
             for(int x = 0; x < w_out; x+=_stride) {
-                if(_mode == "avg") {
+                if(_mode == PoolingOperation::AVG) {
                     int in_vol[3] = {layer, y_out, x_out};
                     double average_dout = out.getValue(in_vol, 3) / (_size*2);
 
-                    for (int f_y_it = y; f_y_it < y + _size; f_y_it++) {
-                        for (int f_x_it = x; f_x_it < x + _size; f_x_it++) {
-                            int out_in[3] = {layer, f_y_it, f_x_it};
+                    for (int f_y = y; f_y < y + _size; f_y++) {
+                        for (int f_x = x; f_x < x + _size; f_x++) {
+                            int out_in[3] = {layer, f_y, f_x};
 
-                            image.add(average_dout, out_in, 3);
+                            image.aggregate(average_dout, out_in, 3);
                         }
                     }
-                } else if(_mode == "max") {
+                } else if(_mode == PoolingOperation::MAX) {
                     vector<double> area;
-                    for (int f_y_it = y; f_y_it < y + _size; f_y_it++) {
-                        for (int f_x_it = x; f_x_it < x + _size; f_x_it++) {
-                            int out_in[3] = {layer, f_y_it, f_x_it};
+                    for (int f_y = y; f_y < y + _size; f_y++) {
+                        for (int f_x = x; f_x < x + _size; f_x++) {
+                            int out_in[3] = {layer, f_y, f_x};
                             area.push_back(image.getValue(out_in, 3));
                         }
                     }
@@ -121,7 +122,7 @@ void PoolingLayer::bp(Elements out, Elements &image) {
 
                     int out_in[3] = {layer, y + y_i, x + x_i};
 
-                    image.add(max_element, out_in, 3);
+                    image.aggregate(max_element, out_in, 3);
                 }
             }
             x_out++;

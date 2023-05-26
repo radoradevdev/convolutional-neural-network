@@ -99,7 +99,7 @@ QImage Util::grayscaleToHeatmap(const QImage &grayscaleImage) {
     colorMap << qRgb(82, 0, 97);
     colorMap << qRgb(76, 0, 106);
     colorMap << qRgb(70, 0, 115);
-    colorMap << qRgb(63, 0, 125);          // Dark Purple
+    colorMap << qRgb(63, 0, 125);   // Dark Purple
 
     // Iterate over the pixels of the grayscale image
     for (int y = 0; y < grayscaleImage.height(); ++y) {

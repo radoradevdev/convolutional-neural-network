@@ -1,6 +1,7 @@
 #ifndef CARTEDUCIEL_H
 #define CARTEDUCIEL_H
 
+// Here the parameters of the dataset must be set
 #define CARTEDUCIEL_TRAIN_LEN 9600
 #define CARTEDUCIEL_TEST_LEN 4800
 #define IMAGE_SIDE 28
@@ -30,16 +31,18 @@ public:
             );
 
 private:
-    //! Load dataset from binary files
+    //! Load dataset from folder
     /*!
-      \param path       path to binary file
+      \param path       path to folder
       \param set        dataset
       \param values     expected values
+      \param length     length of the dataset
     */
     void loadDataset(string path,
             Elements &set,
             vector<int> &values,
-            int length);
+            int length
+            );
 
     //! Initialze the dataset with its properties
     /*!
@@ -52,14 +55,15 @@ private:
             Elements &Train_DS,
             vector<int> &Train_EV,
             Elements &Test_DS,
-            vector<int> &Test_EV);
+            vector<int> &Test_EV
+            );
 
-    //! Normaliza a set
+    //! Normalise a set
     /*!
-      \param set    dataset
-      \param length length of dataset
-      \param width  width of images
-      \param height height of images
+      \param set        dataset
+      \param length     length of dataset
+      \param width      width of images
+      \param height     height of images
     */
     void normalizeSet(
             Elements &set,

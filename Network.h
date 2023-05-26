@@ -65,7 +65,7 @@ public:
      */
     void addPoolingLayer(
             vector<int> &image_dim,
-            string mode = "avg",
+            PoolingOperation mode = PoolingOperation::AVG,
             int size = 2,
             int stride = 2
             );

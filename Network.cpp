@@ -7,8 +7,6 @@
 
 #include <QLabel>
 
-#include <External/qcustomplot.h>
-
 void Network::addConvolutionalLayer(
         vector<int> &image_dim,
         vector<int> &kernels,
@@ -29,11 +27,10 @@ void Network::addConvolutionalLayer(
 
 void Network::addPoolingLayer(
         vector<int> &image_dim,
-        string mode,
+        PoolingOperation mode,
         int size,
         int stride
-        )
-{
+        ) {
     int *dim_ptr = &image_dim[0];
 
     PoolingLayer layer(dim_ptr, mode, size, stride);
@@ -89,22 +86,22 @@ void Network::_forward(Elements &image, bool b_plot) {
         }
         if (_layers[layer_indx] == LayerType::Conv) {
             // Forward convolution
-            _convs[_conv_indx].fwd(image, img_out);
+            _convs[_conv_indx].fwd(image, img_out); // debug this line to verify the hyperparams
 
             // move the conv_indx forward,
             // because there can be more than one conv layers
             _conv_indx++;
 
-            image = img_out;
+            image = img_out; // debug this line to verify the hyperparams
         } else if (_layers[layer_indx] == LayerType::Pool) {
-            // Forward convolution
-            _pools[_pool_indx].fwd(image, img_out);
+            // Forward Pooling
+            _pools[_pool_indx].fwd(image, img_out); // debug this line to verify the hyperparams
 
             // move the pool_indx forward,
             // because there can be more than one pool layers
             _pool_indx++;
 
-            image = img_out;
+            image = img_out; // debug this line to verify the hyperparams
         } else if (_layers[layer_indx] == LayerType::Full) {
 
             if (_dense_input_shape[0] == 0) {
@@ -131,7 +128,7 @@ void Network::_backward(vector<double> &gradient) {
         } else if (_layers[layer_indx] == LayerType::Pool) {
             _pool_indx--;
 
-            // Backwards convolution
+            // Backwards Pooling
             _pools[_pool_indx].bp(img_in, img_out);
             img_in = img_out;
         } else if (_layers[layer_indx] == LayerType::Full) {
@@ -156,7 +153,7 @@ void Network::_getImage(Elements &image, Elements &dataset, int index) {
                 int index_ds[4] = {index, depth, height, width};
                 int index_im[3] = {depth, height, width};
                 val = dataset.getValue(index_ds, 4);
-                image.assign(val, index_im, 3);
+                image.allocate(val, index_im, 3);
             }
         }
     }
@@ -232,9 +229,8 @@ void Network::_iterate(
         // Adjust the weights
         if (b_training) {
             _backward(error);
-        } else {
-//            cout << ""; // breakpoint here to debug
         }
+
         if (sample_indx % preview_interval == 0 && sample_indx != 0) {
             double left, total;
             time_t elapsed;
@@ -298,7 +294,7 @@ void Network::checkConfiguration(int set_size, int epochs) {
                 for (int r = 0; r < _image_shape[2]; ++r) {
                     int index[4] = {sample, d, r, c};
                     val = Test_DS.getValue(index, 4);
-                    check_DS.assign(val, index, 4);
+                    check_DS.allocate(val, index, 4);
                 }
             }
         }

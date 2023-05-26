@@ -49,7 +49,7 @@ Elements::Elements(int *params, int length) {
 
 void Elements::init(const int *params, int length) {
     if (_data.size() != 0) {
-        QTextStream(stderr) << "Data already set" << Qt::endl;
+        throw std::runtime_error("Data already set");
     } else {
         _init(params, length);
 
@@ -88,10 +88,10 @@ int Elements::_find(int *indices, int length) const {
     return element;
 }
 
-void Elements::assign(double val, int *indices, int length) {
+void Elements::allocate(double val, int *indices, int length) {
 
     if (length != _params_length) {
-        QTextStream(stderr) << "Incorrect params length" << Qt::endl;
+        throw std::runtime_error("Incorrect params length");
     } else {
         // When _params_length = 4:
         // _data[l + h*l + w*l*h + d*l*h*w]
@@ -102,6 +102,10 @@ void Elements::assign(double val, int *indices, int length) {
         // When _params_length = 2:
         // _data[h + w*h]
         int element = _find(indices, length);
+
+        if(element >= _data.size()) {
+            throw std::runtime_error("Too large index for the data vector!");
+        }
         _data[element] = val;
     }
 }
@@ -110,7 +114,7 @@ double Elements::getValue(int *indices, int params_length) const {
     double res = -1;
 
     if (params_length != _params_length) {
-        QTextStream(stderr) << "Incorrect params length" << Qt::endl;
+        throw std::runtime_error("Incorrect params length");
     } else {
         // When _params_length = 4:
         // _data[l + h*l + w*l*h + d*l*h*w]
@@ -129,9 +133,9 @@ double Elements::getValue(int *indices, int params_length) const {
     return res;
 }
 
-void Elements::add(double val, int *indices, int length) {
+void Elements::aggregate(double val, int *indices, int length) {
     if (length != _params_length) {
-        QTextStream(stderr) << "Incorrect params length" << Qt::endl;
+        throw std::runtime_error("Incorrect params length");
     } else {
         // When _params_length = 4:
         // _data[l + h*l + w*l*h + d*l*h*w]
@@ -143,6 +147,9 @@ void Elements::add(double val, int *indices, int length) {
         // _data[h + w*h]
         int element = _find(indices, length);
 
+        if(element >= _data.size()) {
+            throw std::runtime_error("Too large index for the data vector!");
+        }
         _data[element] += val;
     }
 }
@@ -177,7 +184,7 @@ Elements &Elements::operator=(const Elements &elements) {
 
 double &Elements::operator[](int index) {
     if (index >= _length) {
-        QTextStream(stderr) << "Index out of bound" << Qt::endl;
+        throw std::runtime_error("Index out of bound");
         return _data.back();
     }
 

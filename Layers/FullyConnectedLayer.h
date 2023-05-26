@@ -14,15 +14,15 @@
 #include "Neuron.h"
 
 //! Hyperparameters for the Adam function
-#define BETA1 0.9
-#define BETA2 0.999
+#define FIRST_MOMENT_DECAY 0.9
+#define SECOND_MOMENT_DECAY 0.999
 #define EPS 1e-7
 
 using namespace std;
 
 //! Fully connected layer class
 /*!
-  The class describes the oprations of a multi layered perceptron.
+  The class describes the oprations of a multi-layered perceptron.
   And it will compute the class scores, after the convolutional layer.
 */
 class FullyConnectedLayer {
@@ -78,14 +78,14 @@ public:
             );
 
 private:
-    vector<int> _sublayers;    /*!< sublayers in the fully connected layer */
-    double _bias;   /*!< constant to offset the weights */
-    double _eta;    /*!< learning rate parameter, size of step towards loss=0 */
+    vector<int> _sublayers;     /*!< sublayers in the fully connected layer */
+    double _bias;               /*!< constant to offset the weights */
+    double _eta;                /*!< learning rate parameter, size of step towards loss=0 */
 
-    int _back_iter; /*!< backpropagation iterations */
-    bool _b_adam;   /*!< apply adam or not? */
+    int _back_iter;             /*!< backpropagation iterations */
+    bool _b_adam;               /*!< apply adam or not? */
 
-    vector<vector<Neuron>> _network;    /*!< network of perceptrons */
+    vector<vector<Neuron>> _network;        /*!< network of perceptrons */
     vector<vector<double>> _values;         /*!< values obtained in forward prop */
     vector<vector<double>> _d;              /*!< values obtained in backward prop */
     vector<vector<double>> _loss_gradient;  /*!< errors */
