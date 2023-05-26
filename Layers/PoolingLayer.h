@@ -21,8 +21,7 @@ public:
             int image_dim[3],
             string mode = "avg",
             int size = 2,
-            int stride = 2,
-            int padding = 0
+            int stride = 2
             );
 
     //! Forward propagation in the pooling layer
@@ -43,7 +42,6 @@ private:
 
     int _size = 2;      /*!< TODO */
     int _stride = 2;    /*!< How many pixels every convolution to shift */
-    int _padding = 0;   /*!< Padding on all sides, for the kernel to operate */
     string _mode = "avg";   /*!< Mode of pooling */
 
     Elements _cache;    /*!< the cached forward elements */

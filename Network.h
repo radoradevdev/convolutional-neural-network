@@ -62,14 +62,12 @@ public:
      * \param mode          method of pooling
      * \param size          size of pooling
      * \param stride        stride of pooling
-     * \param padding       padding of pooling
      */
     void addPoolingLayer(
             vector<int> &image_dim,
             string mode = "avg",
             int size = 2,
-            int stride = 2,
-            int padding = 0
+            int stride = 2
             );
 
     //! Adds a Fully Connected Layer

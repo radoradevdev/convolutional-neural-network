@@ -31,13 +31,12 @@ void Network::addPoolingLayer(
         vector<int> &image_dim,
         string mode,
         int size,
-        int stride,
-        int padding
+        int stride
         )
 {
     int *dim_ptr = &image_dim[0];
 
-    PoolingLayer layer(dim_ptr, mode, size, stride, padding);
+    PoolingLayer layer(dim_ptr, mode, size, stride);
     _pools.push_back(layer);
     _layers.push_back(LayerType::Pool);
     _total_lrs++;
@@ -99,7 +98,7 @@ void Network::_forward(Elements &image, bool b_plot) {
             image = img_out;
         } else if (_layers[layer_indx] == LayerType::Pool) {
             // Forward convolution
-            _pools[_conv_indx].fwd(image, img_out);
+            _pools[_pool_indx].fwd(image, img_out);
 
             // move the pool_indx forward,
             // because there can be more than one pool layers

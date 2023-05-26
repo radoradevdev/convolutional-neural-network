@@ -1,24 +1,24 @@
 #include "PoolingLayer.h"
 
+#include <QTextStream>
+
 PoolingLayer::PoolingLayer(
         int image_dim[3],
         string mode,
         int size,
-        int stride,
-        int padding
+        int stride
         ) {
 
     // Set image dim,
     // 3 is the length of the image_dim hyperparameter
     copy(image_dim, image_dim + 3, begin(_image_dim));
 
-    _padding = padding;
     _stride = stride;
     _mode = mode;
     _size = size;
 
-    int pad_dim[3] = {_image_dim[0], _image_dim[1] + 2 * _padding,
-                      _image_dim[2] + 2 * _padding};
+    int pad_dim[3] = {_image_dim[0], _image_dim[1],
+                      _image_dim[2]};
     // Update _image_dim with padding
     copy(pad_dim, pad_dim + 3, begin(_image_dim));
 
@@ -50,7 +50,7 @@ void PoolingLayer::fwd(const Elements& image, Elements &out) {
                     double sum = 0.0;
                     for (int f_y_it = 0; f_y_it < _size; f_y_it++) {
                         for (int f_x_it = 0; f_x_it < _size; f_x_it++) {
-                            int in_cache[3] = {layer, y + f_y_it, x + f_x_it};
+                            int in_cache[3] = {layer, y + _size, x + _size};
                             sum += _cache.getValue(in_cache, 3);
                         }
                     }
@@ -59,7 +59,7 @@ void PoolingLayer::fwd(const Elements& image, Elements &out) {
                     double max = 0.0;
                     for (int f_y_it = 0; f_y_it < _size; f_y_it++) {
                         for (int f_x_it = 0; f_x_it < _size; f_x_it++) {
-                            int in_cache[3] = {layer, y + f_y_it, x + f_x_it};
+                            int in_cache[3] = {layer, y + _size, x + _size};
                             max = _cache.getValue(in_cache, 3) > max ?_cache.getValue(in_cache, 3) : max;
                         }
                     }
@@ -74,12 +74,17 @@ void PoolingLayer::fwd(const Elements& image, Elements &out) {
 
 void PoolingLayer::bp(Elements out, Elements &image) {
     int layers = _image_dim[0],
-        w_out = _image_dim[1],
-        h_out = _image_dim[2];
+        w_in = _image_dim[1],
+        h_in = _image_dim[2];
 
-    _out_dim[0] = _image_dim[0]; // The output depth is equal to the number of kernels of the filter
-    _out_dim[1] = int((w_out - _size)/_stride)+1;
-    _out_dim[2] = int((h_out - _size)/_stride)+1;
+    _out_dim[0] = layers; // The output depth is equal to the number of kernels of the filter
+    _out_dim[1] = w_in;
+    _out_dim[2] = h_in;
+
+    int w_out = int((w_in - _size)/_stride)+1,
+    h_out = int((h_in - _size)/_stride)+1;
+
+    image.reinit(_out_dim, 3);
 
     for (int layer = 0; layer < layers; layer++) {
         int y_out = 0, x_out = 0;
@@ -89,21 +94,34 @@ void PoolingLayer::bp(Elements out, Elements &image) {
 
             for(int x = 0; x < w_out; x+=_stride) {
                 if(_mode == "avg") {
-                    for (int f_y_it = 0; f_y_it < _size; f_y_it++) {
-                        for (int f_x_it = 0; f_x_it < _size; f_x_it++) {
-                        //      average_dout=d_out[layer,y_out,x_out]/(self.size*2)
-                        //      out[layer, y:(y+self.size), x:(x+self.size)] += np.ones((self.size,self.size))*average_dout
+                    int in_vol[3] = {layer, y_out, x_out};
+                    double average_dout = out.getValue(in_vol, 3) / (_size*2);
 
-                            int in_vol[3] = {layer, y_out, x_out};
-                            double average_dout = out.getValue(in_vol, 3) / (_size*2);
-
-                            int out_in[3] = {layer, y + f_y_it, x + f_x_it};
+                    for (int f_y_it = y; f_y_it < y + _size; f_y_it++) {
+                        for (int f_x_it = x; f_x_it < x + _size; f_x_it++) {
+                            int out_in[3] = {layer, f_y_it, f_x_it};
 
                             image.add(average_dout, out_in, 3);
                         }
                     }
                 } else if(_mode == "max") {
+                    vector<double> area;
+                    for (int f_y_it = y; f_y_it < y + _size; f_y_it++) {
+                        for (int f_x_it = x; f_x_it < x + _size; f_x_it++) {
+                            int out_in[3] = {layer, f_y_it, f_x_it};
+                            area.push_back(image.getValue(out_in, 3));
+                        }
+                    }
 
+                    double max_element = *std::max_element(area.begin(), area.end());
+                    auto max_element_auto = std::max_element(area.begin(), area.end());
+                    int index = std::distance(area.begin(), max_element_auto);
+                    int y_i = index / _size;
+                    int x_i = index % _size;
+
+                    int out_in[3] = {layer, y + y_i, x + x_i};
+
+                    image.add(max_element, out_in, 3);
                 }
             }
             x_out++;

@@ -8,8 +8,13 @@ using namespace std;
 // Hyperparameters
 bool adam;
 double bias, roc;
-vector<int> conv_1{1, 28, 28}, conv_kernels_1{8, 3, 3, 1};
-vector<int> conv_2{8, 13, 13}, conv_kernels_2{2, 3, 3, 8}, hidden{72};
+// with pooling layers
+vector<int> conv_1{1, 28, 28}, pool_1{8, 30, 30}, conv_kernels_1{8, 3, 3, 1};
+vector<int> conv_2{8, 14, 14}, pool_2{2, 16, 16}, conv_kernels_2{2, 3, 3, 8}, hidden{128};
+
+// without pooling layers
+//vector<int> conv_1{1, 28, 28}, conv_kernels_1{8, 3, 3, 1};
+//vector<int> conv_2{8, 13, 13}, conv_kernels_2{2, 3, 3, 8}, hidden{72};
 int input_layer, num_classes, epochs, padding, stride;
 
 int main(int argc, char *argv[]) {
@@ -19,26 +24,30 @@ int main(int argc, char *argv[]) {
     Network network;
 
     // configure the network
-    network.addConvolutionalLayer(conv_1, conv_kernels_1, padding = 0, stride = 2,
+    network.addConvolutionalLayer(conv_1, conv_kernels_1, padding = 1, stride = 1,
                                   bias = 0.1, roc = 0.01);
 
-    network.addConvolutionalLayer(conv_2, conv_kernels_2, padding = 0, stride = 2,
+    network.addPoolingLayer(pool_1, "avg", 2, 2);
+
+    network.addConvolutionalLayer(conv_2, conv_kernels_2, padding = 1, stride = 1,
                                   bias = 0.1, roc = 0.01);
 
-    network.addFullyConnectedLayer(input_layer = 2 * 6 * 6, hidden,
-                                   num_classes = 10, bias = 1.0, adam = false,
+    network.addPoolingLayer(pool_2, "avg", 2, 2);
+
+    network.addFullyConnectedLayer(input_layer = 2 * 8 * 8, hidden,
+                                   num_classes = 4, bias = 1.0, adam = false,
                                    roc = 0.5);
 
     // load the dataset
-    network.loadDataset(DatasetType::MNIST);
+    network.loadDataset(DatasetType::CARTEDUCIEL);
 
     // train the network
-    network.train(epochs = 4, 100, false);
+    network.train(epochs = 5, 100, false);
 
-    network.plotResults(false);
+//    network.plotResults(false);
 
     // test the network, with another set
-    // network.test(100);
+     network.test(100);
 
     // network.plotResults();
 
