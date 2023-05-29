@@ -26,16 +26,16 @@ public:
     /*!
       \param height height of every image
       \param width  width of every image
-      \param depth  TODO
+      \param depth  three-dimensional param
     */
     Elements(int height, int width, int depth);
 
     //! Constructor layers, height, width and depth
     /*!
-      \param layers TODO
+      \param layers layers stacked on top of each other, additional to 3d
       \param height height of every image
       \param width  width of every image
-      \param depth  TODO
+      \param depth  three-dimensional param
     */
     Elements(int layers, int height, int width, int depth);
 
@@ -71,7 +71,7 @@ public:
 
     //! Get value
     /*!
-      \param indices          TODO
+      \param indices        3 or 4 values representing the position in the tensors
       \param params_length  length of the parameters
     */
     double getValue(int *indices, int params_length) const;

@@ -147,8 +147,6 @@ void MNIST::getDataset(Elements &Train_DS, vector<int> &Train_EV,
     normalizeSet(Test_DS, MNIST_TEST_LEN, IMAGE_SIDE, IMAGE_SIDE);
 }
 
-// TODO delete comment
-// Should require also the depth value
 void MNIST::normalizeSet(
         Elements &set,
         int length,

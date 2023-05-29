@@ -65,10 +65,10 @@ private:
 
     int _padding = 1;   /*!< Padding on all sides, for the kernel to operate */
     int _stride = 2;    /*!< How many pixels every convolution to shift */
-    int _iteration = 0; /*!< TODO Iterations over the Convolutional layer, for 1 epoch */
+    int _iteration = 0; /*!< Iterations over the Convolutional layer, for 1 epoch */
     double _eta = 0.1;  /*!< learning rate parameter, size of step towards loss=0 */
 
-    vector<double> _bias; /*!< TODO Constant to offset the weights */
+    vector<double> _bias; /*!< Constant to offset the weights */
 
     Elements _cache;    /*!< the cached forward elements */
     Elements _filter;   /*!< firstly, it holds randomized values and
@@ -83,8 +83,8 @@ private:
 
     //! Applies the gradient descent
     /*!
-      \param d_filter   TODO
-      \param d_bias     TODO
+      \param d_filter   filter weights
+      \param d_bias     bias terms
     */
     void _applyGradientDescent(Elements &d_filter, vector<double> &d_bias);
 

@@ -120,8 +120,6 @@ void CarteDuCiel::getDataset(
     normalizeSet(Test_DS, CARTEDUCIEL_TEST_LEN, IMAGE_SIDE, IMAGE_SIDE);
 }
 
-// TODO: delete comment
-// Should require also the depth value
 void CarteDuCiel::normalizeSet(
         Elements &set,
         int length,

@@ -56,7 +56,7 @@ public:
             double eta = 0.01
             );
 
-    //! TODO Adds a Pooling Layer
+    //! Adds a Pooling Layer
     /*!
      * \param image_dim     image dimensions
      * \param mode          method of pooling
@@ -175,7 +175,7 @@ private:
 
     //! Performs backwards propagation
     /*!
-      \param gradient TODO backwards gradient data
+      \param gradient the gradient needed for the backpropagation
     */
     void _backward(vector<double> &gradient);
 
