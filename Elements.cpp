@@ -147,6 +147,7 @@ void Elements::aggregate(double val, int *indices, int length) {
         // _data[h + w*h]
         int element = _find(indices, length);
 
+
         if(element >= _data.size()) {
             throw std::runtime_error("Too large index for the data vector!");
         }

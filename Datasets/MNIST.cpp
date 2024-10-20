@@ -86,7 +86,7 @@ void MNIST::loadDataset(
 
         // Also load the validation set
         if (hasValid) {
-            for (int indx_img = len+1; indx_img < number_of_images; ++indx_img) {
+            for (int indx_img = 0; indx_img < MNIST_VALID_LEN; ++indx_img) {
                 for (int indx_row = 0; indx_row < n_rows; ++indx_row) {
                     for (int indx_col = 0; indx_col < n_cols; ++indx_col) {
                         unsigned char temp = 0;
@@ -131,8 +131,7 @@ void MNIST::getDataset(Elements &Train_DS, vector<int> &Train_EV,
 
     QTextStream(stdout) << "\n> Loading MNIST dataset" << Qt::endl;
 
-    string path_to_folder = "/Users/radoslavradev/Sites/bachelor-thesis/"
-                            "bachelor-thesis-source-code/MNIST_data/";
+    string path_to_folder = "/Users/radoslavradev/Sites/bachelor-thesis/bachelor-thesis-source-code/MNIST_data/";
 
     // load the datasets from the binary files
     loadDataset(path_to_folder + "train-images.idx3-ubyte", Train_DS, Valid_DS, true);

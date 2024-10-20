@@ -47,13 +47,13 @@ void Network::addFullyConnectedLayer(
         bool adam,
         double eta
         ) {
-    vector<int> layers(hidden); // form sublayers, copy vector from hidden
-    layers.insert(layers.begin(), input); // push_front, size of the layer
-    layers.push_back(num_classes); // output layer
+    vector<int> sublayers(hidden); // form sublayers, copy vector from hidden
+    sublayers.insert(sublayers.begin(), input); // push_front, size of the layer
+    sublayers.push_back(num_classes); // output layer
     // At this point layers = { input, hidden, num_classes }
 
     // Initialise the fully connected layer with the hyperparameters
-    FullyConnectedLayer layer(layers, bias, adam, eta);
+    FullyConnectedLayer layer(sublayers, bias, adam, eta);
     _fulls.push_back(layer);
     _num_clss = num_classes;
     _layers.push_back(LayerType::Full);
@@ -110,6 +110,7 @@ void Network::_forward(Elements &image, bool b_plot) {
                 _dense_input_shape[2] = image.getParam(2); // width
             }
             // Forward propagation
+            // In this implementation, there can be only one FC layer, thats why the 0
             _results = _fulls[0].fwd(image.getData());
         }
     }
